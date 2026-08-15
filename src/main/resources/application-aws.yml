@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      minimum-idle: ${DB_POOL_MIN:2}
+      connection-timeout: 10000
+      validation-timeout: 5000
+      max-lifetime: 840000
+      keepalive-time: 120000
+
+app:
+  storage:
+    type: s3
+    s3:
+      bucket: ${S3_BUCKET}
+      region: ${AWS_REGION:ap-northeast-2}
+      prefix: ${S3_PREFIX:private}

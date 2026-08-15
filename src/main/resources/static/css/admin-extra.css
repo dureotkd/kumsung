@@ -1,0 +1,236 @@
+.business-form input,
+.business-form select,
+#noticeForm input,
+#noticeForm textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+  padding: 11px;
+  margin: 8px 0;
+  outline: none;
+}
+
+.business-form input:focus,
+#noticeForm input:focus,
+#noticeForm textarea:focus {
+  border-color: var(--blue);
+}
+
+#noticeForm .notice-pin {
+  display: flex;
+  align-items: center;
+  align-self: end;
+  gap: 9px;
+  min-height: 42px;
+  margin: 0 0 1px;
+  padding: 0 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+#noticeForm .notice-pin input[type="checkbox"] {
+  display: inline-block;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--blue);
+}
+
+#noticeForm .notice-pin span {
+  line-height: 1;
+}
+
+.smtp-help {
+  color: var(--muted);
+  margin: 6px 0;
+}
+
+.smtp-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.smtp-config > div {
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+  padding: 14px;
+}
+
+.smtp-config small,
+.smtp-config strong {
+  display: block;
+}
+
+.smtp-config small {
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.smtp-test-form {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.smtp-test-form label {
+  flex: 1;
+}
+
+.smtp-test-form input {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  padding: 11px;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .smtp-test-form {
+    display: block;
+  }
+  .smtp-test-form button {
+    margin-top: 10px;
+  }
+}
+
+.admin-invite-form {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin: 20px 0 10px;
+}
+
+.admin-invite-form input,
+.admin-invite-form select {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+  padding: 11px;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .admin-invite-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.side-brand .side-logo {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+}
+
+.side-brand .side-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.stats {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.stat-link {
+  cursor: pointer;
+}
+
+.stat-link:hover {
+  border-color: var(--blue);
+  box-shadow: 0 8px 24px rgba(18, 104, 232, .08);
+}
+
+.support-meta {
+  margin-top: 18px;
+}
+
+.support-meta .support-copy {
+  grid-column: 1 / -1;
+  min-height: 120px;
+  white-space: pre-wrap;
+  line-height: 1.75;
+}
+
+#supportProcessForm textarea {
+  resize: vertical;
+}
+
+.previous-answer {
+  margin: 16px 0;
+  padding: 16px;
+  border-left: 3px solid var(--blue);
+  background: var(--soft);
+}
+
+.previous-answer p,
+.timeline p {
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+
+.managed-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.managed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.managed-form label {
+  color: #30463a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.managed-form label small {
+  margin-left: 5px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.managed-form input,
+.managed-form select,
+.managed-form textarea {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+  font: inherit;
+}
+
+.managed-form input:focus,
+.managed-form select:focus,
+.managed-form textarea:focus {
+  border-color: var(--blue);
+  outline: none;
+}
+
+.managed-form input[type="file"] { padding: 7px; }
+.managed-form textarea { resize: vertical; }
+.managed-check-row,.managed-actions { display: flex; flex-wrap: wrap; gap: 16px; }
+.managed-check { display: flex !important; align-items: center; gap: 8px; width: fit-content; }
+.managed-check input { width: 17px; height: 17px; margin: 0; accent-color: var(--blue); }
+.managed-actions .secondary { background: #fff; }
+.admin-thumb { width: 72px; height: 54px; border: 1px solid var(--line); border-radius: 4px; object-fit: cover; background: #edf4ef; }
+.admin-row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.admin-row-actions .danger { color: #a82d2d; border-color: #d7aaaa; }
+
+@media (max-width: 720px) {
+  .managed-grid { grid-template-columns: 1fr; }
+}

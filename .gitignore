@@ -1,0 +1,34 @@
+/target/
+/uploads/
+/.idea/
+/.vscode/
+*.iml
+
+# Local environment files. Commit templates only.
+.env*
+!.env.example
+!.env.aws.example
+!.env.production.example
+!.env.demo.example
+!.env.local.example
+
+# Runtime secrets and certificates.
+/.secrets/*
+!/.secrets/.gitkeep
+*.pem
+*.key
+*.p12
+*.jks
+
+# Runtime and deployment artifacts.
+/backups/
+/.local/
+*.log
+*.pid
+*.tar.gz
+*.zip
+docker-compose.override.yml
+
+# OS-generated files.
+.DS_Store
+Thumbs.db

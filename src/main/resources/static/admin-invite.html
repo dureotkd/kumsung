@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>관리자 계정 설정 | (주)금성이엔씨</title>
+  <link rel="stylesheet" href="/css/portal.css">
+  <link rel="stylesheet" href="/css/portal-green.css">
+</head>
+<body class="auth-page">
+  <a class="auth-brand" href="/"><b>K</b><span>(주)금성이엔씨<small>KUMSUNG ENC</small></span></a>
+  <main class="auth-card">
+    <div class="auth-copy"><p>ADMIN ACCOUNT</p><h1>안전한 관리자<br>계정 설정</h1><ul><li>초대받은 이메일 전용</li><li>12자 이상의 개별 비밀번호</li><li>비밀번호 공유 금지</li></ul></div>
+    <section class="auth-form">
+      <form id="activationForm" hidden>
+        <h2 id="activationTitle">관리자 계정 설정</h2>
+        <p id="invitationInfo"></p>
+        <label>새 비밀번호 <small>12자 이상</small><input type="password" minlength="12" maxlength="72" name="password" autocomplete="new-password" required></label>
+        <label>새 비밀번호 확인<input type="password" minlength="12" maxlength="72" name="confirmPassword" autocomplete="new-password" required></label>
+        <button>비밀번호 설정</button>
+      </form>
+      <p id="authMessage">초대 정보를 확인하고 있습니다.</p>
+      <a class="home-link" href="/login.html">로그인 화면으로</a>
+    </section>
+  </main>
+  <script src="/js/common.js"></script>
+  <script>
+    const token=new URLSearchParams(location.search).get("token");
+    async function initialize(){
+      if(!token)throw new Error("초대 또는 재설정 주소가 올바르지 않습니다.");
+      const info=await api("/api/auth/admin-account?token="+encodeURIComponent(token));
+      activationTitle.textContent=info.purpose==="INVITE"?"관리자 초대 수락":"관리자 비밀번호 재설정";
+      invitationInfo.textContent=`${info.name} · ${info.email} · ${info.admin_role==="SUPER_ADMIN"?"최고관리자":"일반관리자"}`;
+      activationForm.hidden=false;authMessage.textContent="";
+    }
+    activationForm.onsubmit=async e=>{
+      e.preventDefault();
+      if(activationForm.password.value!==activationForm.confirmPassword.value){
+        authMessage.textContent="비밀번호 확인 값이 일치하지 않습니다.";return;
+      }
+      try{
+        const result=await api("/api/auth/admin-account",{method:"POST",body:JSON.stringify({token,password:activationForm.password.value})});
+        activationForm.hidden=true;authMessage.textContent=result.message+" 로그인 화면으로 이동해 주세요.";
+      }catch(error){authMessage.textContent=error.message}
+    };
+    initialize().catch(error=>authMessage.textContent=error.message);
+  </script>
+</body>
+</html>

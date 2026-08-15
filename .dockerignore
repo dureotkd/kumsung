@@ -1,0 +1,17 @@
+target
+.git
+.idea
+.vscode
+uploads
+backups
+.secrets
+*.iml
+*.log
+*.tar.gz
+*.zip
+.env*
+!/.env.aws.example
+!/.env.production.example
+!/.env.demo.example
+.DS_Store
+Thumbs.db

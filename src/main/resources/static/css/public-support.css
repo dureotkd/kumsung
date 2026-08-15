@@ -1,0 +1,23 @@
+.public-support { padding: 100px 25px; color: #fff; background: #0b2135; scroll-margin-top: 90px; }
+.support-layout { display: grid; grid-template-columns: .8fr 1.4fr; gap: 70px; }
+.support-copy h2 { margin: 15px 0 22px; font-size: 38px; line-height: 1.35; letter-spacing: -2px; }
+.support-copy > p:not(.section-kicker) { color: #aab9c7; font-size: 13px; line-height: 1.9; }
+.support-copy ul { margin: 30px 0 0; padding: 0; list-style: none; color: #c4d0db; font-size: 13px; line-height: 2.2; }
+.support-copy li::before { content: "✓"; margin-right: 10px; color: #2fc0df; }
+.support-form { padding: 30px; border: 1px solid #ffffff25; background: #fff; color: #14263a; }
+.form-trap { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+.support-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.support-fields label { font-size: 12px; font-weight: 700; }
+.support-fields input,.support-fields textarea { margin-top: 7px; }
+.support-wide { grid-column: 1/-1; }
+.support-agreement { display: flex; align-items: center; gap: 9px; margin: 18px 0; font-size: 11px; color: #607084; }
+.support-agreement input { flex: 0 0 16px; width: 16px; height: 16px; margin: 0; padding: 0; }
+.support-agreement a { color: #1268e8; font-weight: 700; }
+.support-form > button { width: 100%; padding: 16px; border: 0; background: #1268e8; color: #fff; font: 700 14px "Noto Sans KR"; cursor: pointer; }
+.support-form > button:disabled { opacity: .6; }
+.support-message { min-height: 20px; margin: 12px 0 0; text-align: center; color: #d84343; font-size: 12px; }
+.support-message.success { padding: 12px 14px; border: 1px solid #b8e0c8; background: #eef9f2; color: #16814c; font-weight: 700; }
+.support-memo-wrap { display: block; }
+.support-memo-wrap textarea { min-height: 300px; line-height: 2.65; }
+@media(max-width:850px){.support-layout{grid-template-columns:1fr;gap:30px}.support-copy h2{font-size:34px}}
+@media(max-width:520px){.public-support{padding:80px 20px}.support-form{padding:22px 18px}.support-fields{grid-template-columns:1fr}.support-wide{grid-column:auto}.support-memo-wrap textarea{min-height:285px}}

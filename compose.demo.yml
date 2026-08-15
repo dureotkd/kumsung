@@ -1,0 +1,124 @@
+name: kumsung-enc-demo
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kumsung_enc
+      POSTGRES_USER: kumsung
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - demo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kumsung -d kumsung_enc"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
+
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - demo_clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 15
+      start_period: 90s
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod,demo
+      APP_BASE_URL: https://${NGROK_DOMAIN:?NGROK_DOMAIN is required}
+      DB_URL: jdbc:postgresql://postgres:5432/kumsung_enc
+      DB_USERNAME: kumsung
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MAIL_HOST: ${MAIL_HOST:-mailpit}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-MAILPIT}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-demo}
+      # 실제 비밀번호는 컨테이너 환경 목록에 노출하지 않고 읽기 전용 파일에서 로드한다.
+      MAIL_PASSWORD: ""
+      MAIL_PASSWORD_FILE: ${MAIL_PASSWORD_FILE:-/run/secrets/mail_password}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@kumsungenc.co.kr}
+      MAIL_AUTH: ${MAIL_AUTH:-false}
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-false}
+      MAIL_STARTTLS_REQUIRED: ${MAIL_STARTTLS_REQUIRED:-false}
+      MAIL_SSL: ${MAIL_SSL:-false}
+      QUOTE_RECIPIENT: ${QUOTE_RECIPIENT:-estimate@kumsungenc.co.kr}
+      SUPPORT_RECIPIENT: ${SUPPORT_RECIPIENT:-B2B@kumsungenc.co.kr}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-B2B@kumsungenc.co.kr}
+      GOOGLE_SHEETS_ENABLED: ${GOOGLE_SHEETS_ENABLED:-false}
+      GOOGLE_SHEETS_WEBHOOK_URL: ${GOOGLE_SHEETS_WEBHOOK_URL:-}
+      GOOGLE_SHEETS_WEBHOOK_SECRET: ${GOOGLE_SHEETS_WEBHOOK_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      PRIVACY_VERSION: ${PRIVACY_VERSION:-2026-07-28}
+      CLAMAV_HOST: clamav
+      MALWARE_SCAN_ENABLED: "true"
+      MALWARE_SCAN_REQUIRED: "true"
+    volumes:
+      - demo_uploads_data:/data/uploads
+      - demo_app_logs:/data/logs
+      - ./.secrets:/run/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${DEMO_PORT:-8088}:80"
+    volumes:
+      - ./nginx/demo.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/nginx-health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - http
+      - http://nginx:80
+      - --url=https://${NGROK_DOMAIN:?NGROK_DOMAIN is required}
+      - --log=stdout
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?NGROK_AUTHTOKEN is required}
+    ports:
+      - "127.0.0.1:${NGROK_INSPECT_PORT:-4040}:4040"
+    depends_on:
+      nginx:
+        condition: service_healthy
+
+volumes:
+  demo_postgres_data:
+  demo_uploads_data:
+  demo_app_logs:
+  demo_clamav_data:

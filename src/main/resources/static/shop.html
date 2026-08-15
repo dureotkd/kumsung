@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="(주)금성이엔씨 SMART SHOP 제품 문의 접수">
+  <title>SMART SHOP | (주)금성이엔씨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/synced-public.css"><link rel="stylesheet" href="/css/memo-form.css">
+</head>
+<body class="sync-public">
+<div class="sync-shell">
+  <header class="sync-header">
+    <div class="sync-brand-row"><a class="sync-brand" href="/"><img src="/images/kumsung-enc-symbol.png" alt=""><img src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a><a class="sync-login" href="/login.html" data-auth-link>고객 로그인</a></div>
+    <nav class="sync-nav" aria-label="주요 메뉴"><a href="/quote.html">온라인 견적접수</a><a class="active" aria-current="page" href="/shop.html">SMART SHOP</a><a href="/projects.html">기술혁신센터</a><a href="/support.html">고객센터</a></nav>
+  </header>
+  <main>
+    <section class="sync-hero"><p class="eyebrow">SMART SHOP</p><h1>제품을 카테고리에서<br>바로 찾아보세요</h1><p>제품을 선택하고 규격·수량·도면을 남기면 담당자가 제작 가능 여부와 견적을 안내합니다.</p></section>
+    <nav id="shopQuickNav" class="sync-quicknav" aria-label="제품 카테고리"></nav>
+    <section class="sync-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">PRODUCT</span><h2>문의 제품 선택</h2></div></div><p class="sync-section-desc">25개 제품을 분류별로 확인하고 문의할 제품을 선택해 주세요.</p><div id="shopProducts" class="sync-category-grid" aria-live="polite"></div></section>
+    <div id="shopSelectionBar" class="sync-sticky"><div><small>선택한 문의 제품</small><strong><span id="shopSelectionCount">0</span>건</strong></div><a href="#shopInquiry">문의 정보 작성 →</a></div>
+    <section id="shopInquiry" class="sync-section sync-inquiry-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">INQUIRY</span><h2>제작 문의 접수</h2></div></div><p class="sync-section-desc">결제 없이 접수되며 담당자가 확인한 뒤 견적과 납기를 안내합니다.</p>
+      <form id="shopInquiryForm" class="sync-inquiry">
+        <label class="form-trap" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>
+        <label class="memo-textarea-wrap" for="shopMemo"><textarea id="shopMemo" name="shopMemo" rows="8" spellcheck="false" aria-label="문의 및 접수 정보 입력" required>회사명:
+담당자성함 및 직책:
+연락처:
+이메일:
+문의내용:</textarea></label>
+        <label class="sync-agreement"><input name="privacyAgreed" type="checkbox" required><span><a href="/privacy.html" target="_blank">개인정보 수집 및 이용</a>에 동의합니다. (필수)</span></label>
+        <button class="sync-submit submit-shop" type="submit">SMART SHOP 문의 접수 →</button><p id="shopMessage" class="sync-message" role="status"></p>
+      </form>
+    </section>
+  </main>
+  <footer class="sync-footer">© 2026 KUMSUNG ENC CO., LTD. · 가격과 납기는 사양 검토 후 안내됩니다.</footer>
+</div>
+<dialog id="shopSuccess" class="sync-success-dialog"><button type="button" aria-label="닫기">×</button><div>✓</div><h2>제품 문의가 접수되었습니다.</h2><p>접수번호 <strong id="shopReceipt"></strong></p><small>접수 확인 메일을 발송하며 담당자가 검토 후 연락드립니다.</small></dialog>
+<script src="/js/memo-parser.js"></script><script src="/js/shop.js"></script><script src="/js/public-auth.js" defer></script>
+</body>
+</html>

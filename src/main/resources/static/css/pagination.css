@@ -1,0 +1,19 @@
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pager span {
+  min-width: 70px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.pager button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}

@@ -1,0 +1,57 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      connection-timeout: 10000
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: ${MAIL_AUTH:true}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS:true}
+      mail.smtp.starttls.required: ${MAIL_STARTTLS_REQUIRED:true}
+      mail.smtp.ssl.enable: ${MAIL_SSL:false}
+      mail.smtp.ssl.checkserveridentity: true
+
+app:
+  base-url: ${APP_BASE_URL:https://${DOMAIN}}
+  security:
+    trust-forwarded-headers: true
+  upload-dir: /data/uploads
+  quote-recipient: ${QUOTE_RECIPIENT}
+  # 최초 관리자 생성 때만 지정하고, 생성 후에는 환경변수에서 제거한다.
+  admin-email: ${ADMIN_EMAIL:}
+  admin-password: ${ADMIN_PASSWORD:}
+  malware:
+    enabled: true
+    required: true
+    host: clamav
+
+server:
+  forward-headers-strategy: framework
+  shutdown: graceful
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+        same-site: strict
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  file:
+    name: /data/logs/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 30

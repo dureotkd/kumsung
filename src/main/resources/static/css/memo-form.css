@@ -1,0 +1,62 @@
+.memo-textarea-wrap {
+  position: relative;
+}
+
+.memo-textarea-wrap textarea {
+  width: 100%;
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid #cbd7e2;
+  background: #fff;
+  color: #122033;
+  box-shadow: 0 8px 26px rgba(7, 26, 44, .04);
+  font: 600 14px/2.8 "Noto Sans KR", sans-serif;
+  letter-spacing: -.1px;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+.quote-memo-wrap textarea {
+  min-height: 245px;
+}
+
+.memo-textarea-wrap textarea:focus {
+  border-color: #168de1;
+  box-shadow: 0 0 0 3px rgba(22, 141, 225, .07);
+  outline: 0;
+}
+
+.product-hint {
+  position: absolute;
+  top: 18px;
+  left: 78px;
+  max-width: calc(100% - 105px);
+  overflow: hidden;
+  color: #a6b0bb;
+  font: 400 14px/2.8 "Noto Sans KR", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.product-hint[hidden] {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .memo-textarea-wrap textarea {
+    padding: 16px;
+    font-size: 13px;
+    line-height: 2.7;
+  }
+
+  .quote-memo-wrap textarea { min-height: 240px; }
+
+  .product-hint {
+    top: 16px;
+    left: 70px;
+    max-width: calc(100% - 90px);
+    font-size: 13px;
+    line-height: 2.7;
+  }
+}

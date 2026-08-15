@@ -1,0 +1,20 @@
+spring:
+  mail:
+    properties:
+      mail.smtp.auth: ${MAIL_AUTH:false}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS:false}
+      mail.smtp.starttls.required: ${MAIL_STARTTLS_REQUIRED:false}
+
+app:
+  base-url: ${APP_BASE_URL}
+  security:
+    trust-forwarded-headers: true
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        secure: false
+        http-only: true
+        same-site: lax

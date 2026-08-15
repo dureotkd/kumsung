@@ -1,0 +1,26 @@
+.file-row {
+  align-items: center;
+  gap: 10px;
+}
+
+.file-row > span:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.danger {
+  color: var(--red);
+  border-color: #f0caca;
+}
+
+.estimate-summary {
+  padding: 14px;
+  border-left: 4px solid var(--blue);
+  background: #edf6ff;
+  font-size: 12px;
+}
+
+.estimate-summary b {
+  font-size: 16px;
+}

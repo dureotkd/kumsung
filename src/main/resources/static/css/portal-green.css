@@ -1,0 +1,173 @@
+/* Customer portal, admin and authentication deep green theme. */
+:root {
+  --navy: #123c27;
+  --blue: #2f7d4f;
+  --cyan: #74d36d;
+  --ink: #173427;
+  --muted: #62766a;
+  --line: #d5e3d8;
+  --soft: #edf6ef;
+}
+body { background: #f4f7f5; }
+.auth-page { background: linear-gradient(120deg, #0d2d1d 0 48%, #edf5ef 48%); }
+.auth-card { box-shadow: 0 25px 80px #123c2740; }
+.auth-copy { background: linear-gradient(145deg, #205537, #123c27); }
+.auth-copy > p, .auth-copy li::before { color: #8ddd82; }
+.auth-copy ul { color: #cfddd2; }
+.sidebar { background: #123c27; }
+.side-nav button { color: #a9bbae; }
+.side-nav button:hover, .side-nav button.active { background: #ffffff16; }
+.side-nav button.active { border-left-color: #74d36d; }
+.side-bottom a { color: #adbdaf; }
+.avatar { background: #dcece1; color: #205537; }
+.table th { background: #f0f5f1; color: #63766a; }
+.table tr:hover td { background: #f4f8f5; }
+.badge { background: #e1f0e5; color: #267346; }
+.action { color: #2f7d4f; }
+.progress { background: #e1ebe3; }
+.toast { background: #123c27; }
+dialog::backdrop { background: #0a2418bb; }
+.message-row.admin { border-left-color: #2f7d4f; }
+@media (max-width: 850px) { .auth-page { background: #edf5ef; } }
+
+/* Mobile overflow hardening for customer and administrator portals. */
+html,
+body {
+  max-width: 100%;
+}
+
+.app,
+.main,
+.view,
+.panel,
+.panel-head,
+.topbar,
+.toolbar,
+.stats,
+.cards,
+.data-card,
+.detail-grid,
+.file-row,
+.message-row,
+.form-inline {
+  min-width: 0;
+}
+
+.panel,
+.data-card,
+.detail-grid > *,
+.file-row,
+.message-row {
+  overflow-wrap: anywhere;
+}
+
+.table {
+  max-width: 100%;
+}
+
+@media (max-width: 850px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .panel {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .panel-head,
+  .topbar,
+  .toolbar,
+  .file-row,
+  .form-inline {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar input,
+  .toolbar select {
+    flex: 1 1 180px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  dialog {
+    width: min(92vw, 900px);
+    max-width: calc(100vw - 24px);
+  }
+
+  .modal {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 24px 20px;
+  }
+
+  .toast {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+@media (max-width: 520px) {
+  .main {
+    padding: 16px 12px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar h1 {
+    min-width: 0;
+    font-size: 21px;
+    overflow-wrap: anywhere;
+  }
+
+  .panel {
+    padding: 18px 14px;
+  }
+
+  .panel-head {
+    align-items: flex-start;
+  }
+
+  .panel-head > * {
+    min-width: 0;
+  }
+
+  .toolbar input,
+  .toolbar select,
+  .toolbar button {
+    flex-basis: 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .file-row {
+    align-items: flex-start;
+  }
+
+  .form-inline input,
+  .form-inline button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .modal {
+    padding: 22px 16px;
+  }
+}

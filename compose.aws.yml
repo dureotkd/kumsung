@@ -1,0 +1,101 @@
+services:
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod,aws
+      DOMAIN: ${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
+      APP_BASE_URL: https://${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
+      DB_URL: ${DB_URL:?DB_URL is required}
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ""
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      DB_POOL_MIN: ${DB_POOL_MIN:-2}
+      STORAGE_TYPE: s3
+      S3_BUCKET: ${S3_BUCKET:?S3_BUCKET is required}
+      S3_PREFIX: ${S3_PREFIX:-private}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-2}
+      MAIL_HOST: ${MAIL_HOST:?MAIL_HOST is required}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-GOOGLE_WORKSPACE}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:?MAIL_USERNAME is required}
+      MAIL_PASSWORD: ""
+      MAIL_PASSWORD_FILE: /run/secrets/mail_password
+      MAIL_FROM: ${MAIL_FROM:?MAIL_FROM is required}
+      MAIL_AUTH: ${MAIL_AUTH:-true}
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-true}
+      MAIL_STARTTLS_REQUIRED: ${MAIL_STARTTLS_REQUIRED:-true}
+      MAIL_SSL: ${MAIL_SSL:-false}
+      QUOTE_RECIPIENT: ${QUOTE_RECIPIENT:?QUOTE_RECIPIENT is required}
+      SUPPORT_RECIPIENT: ${SUPPORT_RECIPIENT:-B2B@kumsungenc.co.kr}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-B2B@kumsungenc.co.kr}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ""
+      ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+      EMAIL_OUTBOX_POLL_MS: ${EMAIL_OUTBOX_POLL_MS:-1000}
+      EMAIL_OUTBOX_BATCH_SIZE: ${EMAIL_OUTBOX_BATCH_SIZE:-10}
+      GOOGLE_SHEETS_ENABLED: ${GOOGLE_SHEETS_ENABLED:-false}
+      PRIVACY_VERSION: ${PRIVACY_VERSION:-2026-07-28}
+      INQUIRY_RETENTION_DAYS: ${INQUIRY_RETENTION_DAYS:-1095}
+      SHEET_OUTBOX_RETENTION_DAYS: ${SHEET_OUTBOX_RETENTION_DAYS:-1095}
+      CLAMAV_HOST: clamav
+      MALWARE_SCAN_ENABLED: "true"
+      MALWARE_SCAN_REQUIRED: "true"
+    volumes:
+      - app_logs:/data/logs
+    secrets:
+      - db_password
+      - mail_password
+      - admin_password
+    depends_on:
+      clamav:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://localhost:8080/actuator/health/readiness"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${ORIGIN_DOMAIN:?ORIGIN_DOMAIN is required}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  app_logs:
+  clamav_data:
+  caddy_data:
+  caddy_config:
+
+secrets:
+  db_password:
+    file: ${DB_PASSWORD_SECRET_FILE:-./.secrets/db_password}
+  mail_password:
+    file: ${MAIL_PASSWORD_SECRET_FILE:-./.secrets/mail_password}
+  admin_password:
+    file: ${ADMIN_PASSWORD_SECRET_FILE:-./.secrets/admin_password}

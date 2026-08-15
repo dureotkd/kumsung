@@ -1,0 +1,54 @@
+.side-brand.side-brand-official {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px 24px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.side-brand.side-brand-official .side-logo {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+}
+
+.side-brand.side-brand-official .side-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.side-brand-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.side-wordmark {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  height: 29px;
+  object-fit: contain;
+  object-position: left center;
+  pointer-events: none;
+}
+
+.side-brand.side-brand-official small {
+  margin-top: 3px;
+  color: #7ede73;
+  font: 700 7px Manrope, sans-serif;
+  letter-spacing: 1.5px;
+}

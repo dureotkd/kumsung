@@ -1,0 +1,127 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kumsung_enc
+      POSTGRES_USER: kumsung
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kumsung -d kumsung_enc"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+      DB_URL: jdbc:postgresql://postgres:5432/kumsung_enc
+      DB_USERNAME: kumsung
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MAIL_HOST: ${MAIL_HOST:?MAIL_HOST is required}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-CUSTOM}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:?MAIL_USERNAME is required}
+      # SMTP 비밀번호는 Docker secret으로 주입하고 컨테이너 설정에는 경로만 남긴다.
+      MAIL_PASSWORD: ""
+      MAIL_PASSWORD_FILE: /run/secrets/mail_password
+      MAIL_FROM: ${MAIL_FROM:?MAIL_FROM is required}
+      MAIL_AUTH: ${MAIL_AUTH:-true}
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-true}
+      MAIL_STARTTLS_REQUIRED: ${MAIL_STARTTLS_REQUIRED:-true}
+      MAIL_SSL: ${MAIL_SSL:-false}
+      QUOTE_RECIPIENT: ${QUOTE_RECIPIENT:?QUOTE_RECIPIENT is required}
+      SUPPORT_RECIPIENT: ${SUPPORT_RECIPIENT:-B2B@kumsungenc.co.kr}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-B2B@kumsungenc.co.kr}
+      # 최초 관리자 생성 시에만 설정한다. 생성 후 비워도 DB의 관리자 계정은 유지된다.
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      EMAIL_OUTBOX_POLL_MS: ${EMAIL_OUTBOX_POLL_MS:-1000}
+      EMAIL_OUTBOX_BATCH_SIZE: ${EMAIL_OUTBOX_BATCH_SIZE:-10}
+      GOOGLE_SHEETS_ENABLED: ${GOOGLE_SHEETS_ENABLED:-false}
+      GOOGLE_SHEETS_WEBHOOK_URL: ${GOOGLE_SHEETS_WEBHOOK_URL:-}
+      GOOGLE_SHEETS_WEBHOOK_SECRET: ${GOOGLE_SHEETS_WEBHOOK_SECRET:-}
+      PRIVACY_VERSION: ${PRIVACY_VERSION:-2026-07-28}
+      INQUIRY_RETENTION_DAYS: ${INQUIRY_RETENTION_DAYS:-1095}
+      SHEET_OUTBOX_RETENTION_DAYS: ${SHEET_OUTBOX_RETENTION_DAYS:-1095}
+      CLAMAV_HOST: clamav
+      MALWARE_SCAN_ENABLED: "true"
+      MALWARE_SCAN_REQUIRED: "true"
+    volumes:
+      - uploads_data:/data/uploads
+      - app_logs:/data/logs
+    secrets:
+      - mail_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health/readiness"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - uploads_data:/source/uploads:ro
+      - backups_data:/backups
+      - ./scripts/backup.sh:/usr/local/bin/backup.sh:ro
+    entrypoint: ["/bin/sh","-c"]
+    command: ["while true; do /bin/sh /usr/local/bin/backup.sh; sleep 86400; done"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  uploads_data:
+  app_logs:
+  clamav_data:
+  caddy_data:
+  caddy_config:
+  backups_data:
+
+secrets:
+  mail_password:
+    file: ${MAIL_PASSWORD_SECRET_FILE:-./.secrets/mail_password}
