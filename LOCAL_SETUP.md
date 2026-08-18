@@ -5,7 +5,7 @@
 ## 프로젝트 구성
 
 - 백엔드/웹: Java 21, Spring Boot 3.5.14, 정적 HTML·CSS·JavaScript
-- 데이터베이스: PostgreSQL 17, Flyway 마이그레이션 14개
+- 데이터베이스: PostgreSQL 17, Flyway 마이그레이션 16개
 - 로컬 메일: Mailpit SMTP 및 웹 수신함
 - 파일 저장: 로컬 디스크(`.local/data/uploads`)
 - 선택 기능: Google Sheets 연동, ClamAV, S3 저장소는 로컬 기본 실행에서 비활성화
@@ -14,16 +14,29 @@
 
 ## 콘텐츠 운영 방법
 
-관리자 화면(`http://localhost:8080/admin.html`)에 로그인하면 다음 메뉴에서 공개 콘텐츠를 관리할 수 있습니다.
+통합 관리자 화면(`http://localhost:8080/admin.html`)과 SHOP 관리자 화면(`http://localhost:8080/shop-admin.html`)에서 담당 영역별 콘텐츠를 관리합니다.
 
 ### SHOP 제품 관리
 
-1. 왼쪽 메뉴에서 **SHOP 제품 관리**를 선택합니다.
-2. 제품명, 제품 코드, 분류, 설명, 노출 순서와 대표 이미지를 입력합니다.
-3. **SHOP에 공개**를 선택하고 저장하면 고객용 `shop.html`에 반영됩니다.
+1. SHOP 관리자 화면에 로그인하고 왼쪽 메뉴에서 **제품 관리**를 선택합니다.
+2. 제품명, 제품 코드, 분류, 판매 가격, 설명, 노출 순서와 대표 이미지를 입력합니다.
+3. **SMART SHOP에 공개**를 선택하고 저장하면 고객용 `shop.html`에 가격과 제품 정보가 반영됩니다. 가격을 비우면 고객 화면에는 `가격 문의`로 표시됩니다.
 4. 초기 데이터베이스에는 제품 25개가 자동 등록됩니다. 목록의 **수정**으로 제품 정보와 이미지를 교체할 수 있고, **공개/비공개** 버튼으로 고객 노출을 제어합니다.
 
+가격이 1원 이상이고 공개 상태인 제품에는 고객용 `shop.html`에서 **구매하기** 버튼이 표시됩니다. 고객이 수량과 구매자·배송 정보를 입력하면 서버가 관리자 등록 단가를 다시 조회해 주문 금액을 계산하므로 브라우저에서 금액을 바꿔도 승인되지 않습니다.
+
 대표 이미지는 JPG, PNG, WEBP 형식이며 파일당 15MB 이하로 업로드합니다. 기존 제품 문의 접수와 관리자 **SHOP 문의** 처리는 그대로 유지됩니다.
+
+### SHOP 관리자와 토스페이먼츠 설정
+
+1. 최고관리자가 통합 관리자 화면의 **관리자 관리**에서 권한을 `SHOP 관리자`로 선택해 담당자를 초대합니다.
+2. 담당자는 메일 링크에서 자신의 12자 이상 비밀번호를 설정합니다.
+3. SHOP 관리자 계정은 로그인 후 전용 2차 비밀번호 확인 화면으로 이동합니다.
+4. 로그인 비밀번호와 별개인 `SHOP_ADMIN_ACCESS_PASSWORD`를 입력한 관리자만 `shop-admin.html`과 SHOP 관리 API를 사용할 수 있습니다. 확인 화면에는 아이디 입력란이 없으며, 주소를 직접 입력하면 매번 2차 비밀번호 확인 화면으로 이동합니다.
+5. 토스페이먼츠 메뉴에서 테스트·라이브 모드와 클라이언트 키를 저장합니다.
+6. 시크릿 키는 화면이나 DB에 입력하지 않고 `.env.local`의 `TOSS_SECRET_KEY`에 설정한 뒤 애플리케이션을 재시작합니다.
+
+클라이언트 키와 시크릿 키는 같은 상점(MID)에서 발급된 같은 모드의 키여야 합니다. 로컬 기본값은 토스페이먼츠 공식 문서의 공용 테스트 키이며 실제 금액이 차감되지 않습니다. 고객 결제 인증 뒤 서버가 주문번호와 DB 금액을 검증하고 `/v1/payments/confirm`으로 승인하며, 결과와 영수증은 SHOP 관리자 **토스페이먼츠 → 주문·결제 내역**에서 확인합니다. 실제 판매 전에는 반드시 자체 테스트 상점 키와 라이브 키로 교체하세요.
 
 ### 기술혁신 자료
 
@@ -61,6 +74,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 | 메인 웹 | `http://localhost:8080` |
 | 고객 포털 | `http://localhost:8080/portal.html` |
 | 관리자 화면 | `http://localhost:8080/admin.html` |
+| SHOP 관리자 화면 | `http://localhost:8080/shop-admin.html` |
 | 로컬 이메일 수신함 | `http://localhost:8025` |
 | 헬스 체크 | `http://localhost:8080/actuator/health` |
 
@@ -68,6 +82,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 - 이메일: `admin@localhost.test`
 - 비밀번호: `local-admin-1234`
+- SHOP 2차 비밀번호: `local-shop-admin-5678` (`.env.local`의 `SHOP_ADMIN_ACCESS_PASSWORD`로 변경)
 
 이 계정과 비밀번호는 로컬 개발 전용입니다. 운영 환경에서는 사용하지 마세요.
 
@@ -103,6 +118,8 @@ notepad .env.local
 - `MAILPIT_SMTP_PORT`: 로컬 SMTP 포트, 기본 `1025`
 - `MAILPIT_UI_PORT`: Mailpit 웹 포트, 기본 `8025`
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD`: 최초 로컬 관리자 계정
+- `TOSS_SECRET_KEY`: 토스페이먼츠 서버 전용 테스트 또는 라이브 시크릿 키
+- `SHOP_ADMIN_ACCESS_PASSWORD`: SHOP 관리자 진입 전용 2차 비밀번호
 
 포트를 바꾸기 전에는 `local-down.ps1`로 서비스를 종료하세요. `SERVER_PORT`를 변경하면 `APP_BASE_URL`도 같은 포트로 맞춰야 합니다.
 

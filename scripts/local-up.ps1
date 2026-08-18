@@ -204,6 +204,8 @@ $managedEnvironment = @{
     "SUPPORT_EMAIL" = (Get-LocalSetting "SUPPORT_EMAIL" "support@localhost.test")
     "MALWARE_SCAN_ENABLED" = "false"
     "GOOGLE_SHEETS_ENABLED" = "false"
+    "TOSS_SECRET_KEY" = (Get-LocalSetting "TOSS_SECRET_KEY" "")
+    "SHOP_ADMIN_ACCESS_PASSWORD" = (Get-LocalSetting "SHOP_ADMIN_ACCESS_PASSWORD" "local-shop-admin-5678")
 }
 
 $previousEnvironment = @{}
@@ -251,6 +253,7 @@ Write-Host ""
 Write-Host "Kumsung ENC Smart Platform is ready."
 Write-Host "Web:       http://localhost:$serverPort"
 Write-Host "Admin:     http://localhost:$serverPort/admin.html"
+Write-Host "Shop admin:http://localhost:$serverPort/shop-admin.html"
 Write-Host "Mailpit:   http://localhost:$mailpitUiPort"
 Write-Host "Admin ID:  $adminEmail"
 Write-Host "Admin PW:  $adminPassword"

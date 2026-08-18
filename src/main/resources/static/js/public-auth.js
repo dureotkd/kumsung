@@ -11,8 +11,8 @@
     if(!response.ok)return;
     const me=await response.json();
     const isAdmin=me.role==="ADMIN";
-    const destination=isAdmin?"/admin.html":"/portal.html";
-    const label=isAdmin?"관리자 콘솔":"고객 포털";
+    const destination=isAdmin?(me.adminRole==="SHOP_ADMIN"?"/shop-admin-entry.html":"/admin.html"):"/portal.html";
+    const label=isAdmin?(me.adminRole==="SHOP_ADMIN"?"SHOP 관리자":"관리자 콘솔"):"고객 포털";
     links.forEach(link=>{
       link.href=destination;
       link.textContent=link.dataset.authLabel||label;

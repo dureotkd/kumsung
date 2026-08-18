@@ -1,18 +1,9 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>관리자 | (주)금성이엔씨</title><link rel="stylesheet" href="/css/portal.css"><link rel="stylesheet" href="/css/admin-extra.css"><link rel="stylesheet" href="/css/pagination.css"><link rel="stylesheet" href="/css/portal-green.css"><link rel="stylesheet" href="/css/portal-brand.css"></head>
 <body><div class="app"><aside class="sidebar"><a class="side-brand side-brand-official" href="/" aria-label="(주)금성이엔씨 메인 랜딩 페이지" title="메인 페이지로 이동"><span class="side-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><span class="side-brand-copy"><img class="side-wordmark" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"><small>ADMIN CONSOLE</small></span></a><nav class="side-nav">
-<button class="active" data-view="dashboard">운영 현황</button><button data-view="quotes">견적 관리</button><button data-view="catalog">SHOP 제품 관리</button><button data-view="shop">SHOP 문의</button><button data-view="innovation">기술혁신 자료</button><button data-view="media">회사소식·시공사례</button><button data-view="customers">고객 관리</button><button data-view="business">업무 등록</button><button data-view="service">A/S 관리</button><button data-view="support">고객 문의</button><button data-view="email">메일 설정</button><button id="adminAccountsButton" data-view="admins" hidden>관리자 관리</button></nav><div class="side-bottom"><a href="/">사이트 보기</a><a href="#" onclick="logout()">로그아웃</a></div></aside>
+<button class="active" data-view="dashboard">운영 현황</button><button data-view="quotes">견적 관리</button><button data-view="shop">SHOP 문의</button><button data-view="innovation">기술혁신 자료</button><button data-view="media">회사소식·시공사례</button><button data-view="customers">고객 관리</button><button data-view="business">업무 등록</button><button data-view="service">A/S 관리</button><button data-view="support">고객 문의</button><button data-view="email">메일 설정</button><button id="adminAccountsButton" data-view="admins" hidden>관리자 관리</button></nav><div class="side-bottom"><a id="shopAdminLink" href="/shop-admin-entry.html" hidden>SHOP 관리자</a><a href="/">사이트 보기</a><a href="#" onclick="logout()">로그아웃</a></div></aside>
 <main class="main"><header class="topbar"><h1 id="viewTitle">운영 현황</h1><div class="user"><div class="avatar">A</div><div><strong id="userName">관리자</strong><small>(주)금성이엔씨 운영자</small></div></div></header>
 <section id="dashboard" class="view active"><div class="stats"><div class="stat"><small>신규 접수</small><strong id="dReceived">0</strong></div><div class="stat"><small>검토·보완 중</small><strong id="dReviewing">0</strong></div><div class="stat"><small>처리 완료</small><strong id="dCompleted">0</strong></div><div class="stat"><small>고객 수</small><strong id="dCustomers">0</strong></div><div class="stat stat-link" onclick="showAdminView('support')"><small>미처리 고객문의</small><strong id="dSupportOpen">0</strong></div></div><div class="panel"><div class="panel-head"><h2>최근 견적</h2><button class="action" onclick="showAdminView('quotes')">전체 보기</button></div><div id="recentAdminQuotes"></div></div></section>
 <section id="quotes" class="view"><div class="panel"><div class="panel-head"><h2>전체 견적</h2></div><div class="toolbar"><input id="quoteKeyword" placeholder="접수번호, 회사명, 제목 검색"><select id="quoteStatus"><option value="">전체 상태</option><option>RECEIVED</option><option>REVIEWING</option><option>SUPPLEMENT_REQUIRED</option><option>SUPPLEMENTED</option><option>QUOTED</option><option>COMPLETED</option></select><button class="action" onclick="resetPage('admin-quotes');loadAdminQuotes()">검색</button></div><div id="adminQuoteTable"></div></div></section>
-<section id="catalog" class="view">
-  <div class="panel"><div class="panel-head"><div><h2>SHOP 제품 등록·수정</h2><p class="smtp-help">초기 제품 25개가 등록되어 있습니다. 이미지와 정보를 바꾸면 SHOP에 즉시 반영됩니다.</p></div></div>
-    <form id="shopProductForm" class="managed-form" enctype="multipart/form-data"><input type="hidden" name="id">
-      <div class="managed-grid"><label>제품 코드<input name="code" maxlength="40" placeholder="예: CUSTOM_BOX" required></label><label>제품명<input name="name" maxlength="120" required></label><label>분류<input name="category" maxlength="80" placeholder="전기, 소방, 금속가공 등"></label><label>노출 순서<input name="displayOrder" type="number" value="0" required></label></div>
-      <label>제품 설명<textarea name="description" rows="3" maxlength="500"></textarea></label><label>대표 이미지 <small>JPG·PNG·WEBP, 15MB 이하</small><input name="image" type="file" accept=".jpg,.jpeg,.png,.webp"></label>
-      <label class="managed-check"><input name="active" type="checkbox" checked><span>SHOP에 공개</span></label><div class="managed-actions"><button class="action" type="submit">저장</button><button class="action secondary" id="shopProductReset" type="button">새 제품 입력</button></div>
-    </form>
-  </div><div class="panel"><div class="panel-head"><h2>제품 목록</h2><button class="action" type="button" onclick="loadCatalogProducts()">새로고침</button></div><div id="adminProductTable"></div></div>
-</section>
 <section id="shop" class="view"><div class="panel"><div class="panel-head"><h2>SMART SHOP 제품 문의</h2></div><div id="adminShopTable"></div></div></section>
 <section id="innovation" class="view">
   <div class="panel"><div class="panel-head"><div><h2>기술혁신 자료 업로드</h2><p class="smtp-help">대표 이미지는 공개되고, 원본 자료는 고객이 비밀번호를 입력한 뒤 다운로드합니다.</p></div></div>
@@ -53,10 +44,10 @@
     <form id="adminInviteForm" class="admin-invite-form">
       <label>이름<input name="name" maxlength="60" required></label>
       <label>회사 이메일<input name="email" type="email" maxlength="120" required></label>
-      <label>권한<select name="adminRole"><option value="ADMIN">일반관리자</option><option value="SUPER_ADMIN">최고관리자</option></select></label>
+      <label>권한<select name="adminRole"><option value="ADMIN">일반관리자</option><option value="SHOP_ADMIN">SHOP 관리자</option><option value="SUPER_ADMIN">최고관리자</option></select></label>
       <button class="action">초대 메일 발송</button>
     </form>
-    <p class="smtp-help">일반관리자는 견적·고객·업무를 운영할 수 있고, 최고관리자는 관리자 계정과 권한도 관리할 수 있습니다.</p>
+    <p class="smtp-help">일반관리자는 기존 운영 업무, SHOP 관리자는 제품·결제 설정만 담당합니다. 최고관리자는 양쪽 화면과 관리자 권한을 모두 관리할 수 있습니다.</p>
   </div>
   <div class="panel"><div class="panel-head"><h2>관리자 목록</h2><button class="action" type="button" onclick="loadAdminAccounts()">새로고침</button></div><div id="adminAccountTable"></div></div>
   <div class="panel"><div class="panel-head"><h2>대기 중인 초대</h2></div><div id="adminInvitationTable"></div></div>

@@ -251,6 +251,7 @@ public class PortalController {
         result.put("serviceRequests",exportOwnedRows("service_requests",uid));
         result.put("support",exportOwnedRows("support_inquiries",uid));
         result.put("shopInquiries",jdbc.queryForList("select * from shop_inquiries where customer_user_id=? order by created_at,id",uid));
+        result.put("shopOrders",jdbc.queryForList("select * from shop_orders where customer_user_id=? order by created_at,id",uid));
         result.put("shopInquiryItems",jdbc.queryForList("""
             select i.* from shop_inquiry_items i join shop_inquiries s on s.id=i.shop_inquiry_id
             where s.customer_user_id=? order by i.created_at,i.id
@@ -318,6 +319,11 @@ public class PortalController {
             admin_note=null,submission_key=null where customer_user_id=? or lower(email)=lower(?)
             """,alias,uid,old);
         jdbc.update("update shop_inquiry_items set specifications=null where shop_inquiry_id in (select id from shop_inquiries where email=?)",alias);
+        jdbc.update("""
+            update shop_orders set customer_user_id=null,buyer_name='탈퇴 회원',buyer_email=?,buyer_phone='-',
+            delivery_address='계정 삭제 요청에 따라 개인정보가 제거되었습니다.',updated_at=current_timestamp
+            where customer_user_id=? or lower(buyer_email)=lower(?)
+            """,alias,uid,old);
         jdbc.update("delete from email_outbox where lower(recipient)=lower(?) or position(lower(?) in lower(body))>0",old,old);
         jdbc.update("delete from email_logs where lower(recipient)=lower(?)",old);
         jdbc.update("update audit_logs set actor_email=? where lower(actor_email)=lower(?)",alias,old);

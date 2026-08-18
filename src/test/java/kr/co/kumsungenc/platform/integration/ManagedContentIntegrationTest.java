@@ -2,6 +2,7 @@ package kr.co.kumsungenc.platform.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.kumsungenc.platform.content.ManagedContentService;
+import kr.co.kumsungenc.platform.shop.ShopAdminAccessService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -47,8 +49,9 @@ class ManagedContentIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(greaterThanOrEqualTo(25)))
             .andExpect(jsonPath("$[0].imageUrl").isNotEmpty());
-        mvc.perform(get("/api/admin/content/shop-products").param("limit","30")
-                .with(user("admin@example.com").roles("ADMIN")))
+        mvc.perform(get("/api/shop-admin/products").param("limit","30")
+                .sessionAttr(ShopAdminAccessService.VERIFIED_AT,System.currentTimeMillis())
+                .with(user("shop@example.com").authorities(new SimpleGrantedAuthority("ADMIN_SCOPE_SHOP_ADMIN"))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(greaterThanOrEqualTo(25)));
     }

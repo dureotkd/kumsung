@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +17,7 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.http.HttpStatus;
+import kr.co.kumsungenc.platform.shop.ShopAdminAccessService;
 
 @Configuration
 public class SecurityConfig {
@@ -23,8 +25,14 @@ public class SecurityConfig {
 
     @Bean UserDetailsService userDetailsService(AppUserRepository users){
         return username -> users.findByEmailIgnoreCase(username)
-            .map(u -> User.withUsername(u.getEmail()).password(u.getPasswordHash())
-                .roles(u.getRole()).disabled(!u.isEnabled()||!u.isEmailVerified()).build())
+            .map(u -> {
+                var authorities=new java.util.ArrayList<SimpleGrantedAuthority>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_"+u.getRole()));
+                if("ADMIN".equals(u.getRole())&&u.getAdminRole()!=null)
+                    authorities.add(new SimpleGrantedAuthority("ADMIN_SCOPE_"+u.getAdminRole()));
+                return User.withUsername(u.getEmail()).password(u.getPasswordHash())
+                    .authorities(authorities).disabled(!u.isEnabled()||!u.isEmailVerified()).build();
+            })
             .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
@@ -39,18 +47,37 @@ public class SecurityConfig {
         http
           .csrf(c -> c.csrfTokenRepository(csrf))
           .authorizeHttpRequests(a -> a
-            .requestMatchers("/","/index.html","/quote.html","/shop.html","/projects.html","/support.html","/login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
+            .requestMatchers("/","/index.html","/quote.html","/shop.html","/shop-payment-success.html","/shop-payment-fail.html","/projects.html","/support.html","/login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
                 "/api/auth/register","/api/auth/resend","/api/auth/verify","/api/auth/csrf","/api/auth/password/**","/api/public/**",
                 "/admin-invite.html","/api/auth/admin-account","/api/auth/admin-account/**",
                 "/actuator/health","/actuator/health/**","/error").permitAll()
-            .requestMatchers("/admin.html","/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/shop-admin-entry.html","/api/shop-admin/access")
+                .hasAnyAuthority("ADMIN_SCOPE_SHOP_ADMIN","ADMIN_SCOPE_SUPER_ADMIN")
+            .requestMatchers("/shop-admin.html")
+                .hasAnyAuthority("ADMIN_SCOPE_SHOP_ADMIN","ADMIN_SCOPE_SUPER_ADMIN")
+            .requestMatchers("/api/shop-admin/**").access((authentication,context) -> {
+                var authorities=authentication.get().getAuthorities();
+                boolean allowedRole=authorities.stream().anyMatch(authority ->
+                    "ADMIN_SCOPE_SHOP_ADMIN".equals(authority.getAuthority())
+                    ||"ADMIN_SCOPE_SUPER_ADMIN".equals(authority.getAuthority()));
+                return new org.springframework.security.authorization.AuthorizationDecision(
+                    allowedRole&&ShopAdminAccessService.isRecentlyVerified(context.getRequest()));
+            })
+            .requestMatchers("/admin.html","/api/admin/**").access((authentication,context) -> {
+                var authorities=authentication.get().getAuthorities();
+                boolean admin=authorities.stream().anyMatch(authority->"ROLE_ADMIN".equals(authority.getAuthority()));
+                boolean shopOnly=authorities.stream().anyMatch(authority->"ADMIN_SCOPE_SHOP_ADMIN".equals(authority.getAuthority()));
+                return new org.springframework.security.authorization.AuthorizationDecision(admin&&!shopOnly);
+            })
             .anyRequest().authenticated())
           .formLogin(f -> f.loginPage("/login.html").loginProcessingUrl("/login")
             .successHandler((request,response,authentication) -> {
+                boolean shopAdmin=authentication.getAuthorities().stream()
+                    .anyMatch(authority -> "ADMIN_SCOPE_SHOP_ADMIN".equals(authority.getAuthority()));
                 boolean admin=authentication.getAuthorities().stream()
                     .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
                 response.setStatus(HttpStatus.FOUND.value());
-                response.setHeader("Location",admin ? "/admin.html" : "/portal.html");
+                response.setHeader("Location",shopAdmin ? "/shop-admin-entry.html" : admin ? "/admin.html" : "/portal.html");
             })
             .failureHandler((request,response,exception) -> {
                 response.setStatus(HttpStatus.FOUND.value());

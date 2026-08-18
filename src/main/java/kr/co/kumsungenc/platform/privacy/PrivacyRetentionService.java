@@ -42,10 +42,16 @@ public class PrivacyRetentionService {
             delete from privacy_consents p where
             (p.subject_type='SUPPORT_INQUIRY' and exists(select 1 from support_inquiries s where s.id=p.subject_id and s.created_at<current_timestamp-(?*interval '1 day')))
             or (p.subject_type='SHOP_INQUIRY' and exists(select 1 from shop_inquiries s where s.id=p.subject_id and s.created_at<current_timestamp-(?*interval '1 day')))
-            """,inquiryDays,inquiryDays);
+            or (p.subject_type='SHOP_ORDER' and exists(select 1 from shop_orders s where s.id=p.subject_id and s.created_at<current_timestamp-(?*interval '1 day')))
+            """,inquiryDays,inquiryDays,inquiryDays);
         jdbc.update("delete from sheet_outbox where created_at<current_timestamp-(?*interval '1 day')",sheetOutboxDays);
         jdbc.update("delete from support_inquiries where created_at<current_timestamp-(?*interval '1 day')",inquiryDays);
         jdbc.update("delete from shop_inquiries where created_at<current_timestamp-(?*interval '1 day')",inquiryDays);
+        jdbc.update("""
+            update shop_orders set customer_user_id=null,buyer_name='보존기간 만료',buyer_email='expired@invalid.local',
+                buyer_phone='-',delivery_address='개인정보 보존기간이 만료되었습니다.',updated_at=current_timestamp
+            where created_at<current_timestamp-(?*interval '1 day') and buyer_email<>'expired@invalid.local'
+            """,inquiryDays);
         if(TransactionSynchronizationManager.isSynchronizationActive())
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization(){
                 @Override public void afterCommit(){expiredShopFiles.forEach(PrivacyRetentionService.this::deleteFile);}

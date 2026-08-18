@@ -15,9 +15,9 @@
     <nav class="sync-nav" aria-label="주요 메뉴"><a href="/quote.html">온라인 견적접수</a><a class="active" aria-current="page" href="/shop.html">SMART SHOP</a><a href="/projects.html">기술혁신센터</a><a href="/support.html">고객센터</a></nav>
   </header>
   <main>
-    <section class="sync-hero"><p class="eyebrow">SMART SHOP</p><h1>제품을 카테고리에서<br>바로 찾아보세요</h1><p>제품을 선택하고 규격·수량·도면을 남기면 담당자가 제작 가능 여부와 견적을 안내합니다.</p></section>
+    <section class="sync-hero"><p class="eyebrow">SMART SHOP · TOSS PAYMENTS TEST</p><h1>제품을 확인하고<br>바로 구매하세요</h1><p>가격이 등록된 제품은 토스페이먼츠 테스트 결제로 바로 구매할 수 있습니다. 주문제작 제품은 기존처럼 규격·수량·도면을 남겨 문의해 주세요.</p></section>
     <nav id="shopQuickNav" class="sync-quicknav" aria-label="제품 카테고리"></nav>
-    <section class="sync-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">PRODUCT</span><h2>문의 제품 선택</h2></div></div><p class="sync-section-desc">25개 제품을 분류별로 확인하고 문의할 제품을 선택해 주세요.</p><div id="shopProducts" class="sync-category-grid" aria-live="polite"></div></section>
+    <section class="sync-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">PRODUCT</span><h2>제품 구매·문의</h2></div><span id="shopPaymentBadge" class="sync-payment-badge">결제 확인 중</span></div><p class="sync-section-desc">가격이 표시된 제품은 구매하기 버튼으로 결제하고, 가격 문의 제품은 선택해서 제작 문의를 남겨 주세요.</p><div id="shopProducts" class="sync-category-grid" aria-live="polite"></div></section>
     <div id="shopSelectionBar" class="sync-sticky"><div><small>선택한 문의 제품</small><strong><span id="shopSelectionCount">0</span>건</strong></div><a href="#shopInquiry">문의 정보 작성 →</a></div>
     <section id="shopInquiry" class="sync-section sync-inquiry-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">INQUIRY</span><h2>제작 문의 접수</h2></div></div><p class="sync-section-desc">결제 없이 접수되며 담당자가 확인한 뒤 견적과 납기를 안내합니다.</p>
       <form id="shopInquiryForm" class="sync-inquiry">
@@ -32,9 +32,23 @@
       </form>
     </section>
   </main>
-  <footer class="sync-footer">© 2026 KUMSUNG ENC CO., LTD. · 가격과 납기는 사양 검토 후 안내됩니다.</footer>
+  <footer class="sync-footer">© 2026 KUMSUNG ENC CO., LTD. · 현재 토스페이먼츠 테스트 결제로 실제 금액은 차감되지 않습니다.</footer>
 </div>
 <dialog id="shopSuccess" class="sync-success-dialog"><button type="button" aria-label="닫기">×</button><div>✓</div><h2>제품 문의가 접수되었습니다.</h2><p>접수번호 <strong id="shopReceipt"></strong></p><small>접수 확인 메일을 발송하며 담당자가 검토 후 연락드립니다.</small></dialog>
-<script src="/js/memo-parser.js"></script><script src="/js/shop.js"></script><script src="/js/public-auth.js" defer></script>
+<dialog id="shopCheckout" class="sync-checkout-dialog">
+  <button class="sync-dialog-close" type="button" data-checkout-close aria-label="닫기">×</button>
+  <div class="sync-checkout-head"><span>TEST PAYMENT</span><h2 id="checkoutProductName">제품 구매</h2><p>테스트 결제로 실제 금액은 차감되지 않습니다.</p></div>
+  <form id="shopCheckoutForm" class="sync-checkout-form">
+    <input type="hidden" name="productId">
+    <div class="sync-checkout-grid"><label>수량<input name="quantity" type="number" min="1" max="99" value="1" required></label><div class="sync-checkout-total"><small>결제 예정 금액</small><strong id="checkoutAmount">0원</strong></div></div>
+    <label>구매자명<input name="buyerName" maxlength="100" autocomplete="name" required></label>
+    <label>이메일<input name="buyerEmail" type="email" maxlength="120" autocomplete="email" required></label>
+    <label>연락처<input name="buyerPhone" type="tel" maxlength="30" autocomplete="tel" placeholder="010-1234-5678" required></label>
+    <label>배송·현장 주소<textarea name="deliveryAddress" rows="3" maxlength="500" autocomplete="street-address" required></textarea></label>
+    <label class="sync-agreement"><input name="privacyAgreed" type="checkbox" required><span><a href="/privacy.html" target="_blank">개인정보 수집 및 이용</a>에 동의합니다. (필수)</span></label>
+    <button class="sync-submit" type="submit">토스페이먼츠로 결제하기</button><p id="checkoutMessage" class="sync-message" role="status"></p>
+  </form>
+</dialog>
+<script src="https://js.tosspayments.com/v2/standard"></script><script src="/js/memo-parser.js"></script><script src="/js/shop.js"></script><script src="/js/public-auth.js" defer></script>
 </body>
 </html>

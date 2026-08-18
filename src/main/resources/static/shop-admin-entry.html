@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SHOP 관리자 2차 비밀번호 | (주)금성이엔씨</title>
+  <link rel="stylesheet" href="/css/portal.css"><link rel="stylesheet" href="/css/company-brand.css">
+  <link rel="stylesheet" href="/css/auth-fixes.css"><link rel="stylesheet" href="/css/portal-green.css">
+</head>
+<body class="auth-page">
+  <a class="auth-brand official-brand" href="/shop.html" aria-label="SMART SHOP 보기"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark official-brand-wordmark-korean" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
+  <main class="auth-card">
+    <div class="auth-copy"><p>SHOP ADMIN SECURITY</p><h1>SHOP 관리자<br>2차 비밀번호</h1><ul><li>로그인 비밀번호와 분리된 SHOP 전용 비밀번호</li><li>화면 진입 때마다 비밀번호 확인</li><li>제품·가격 및 토스페이먼츠 설정 보호</li></ul></div>
+    <section class="auth-form">
+      <form id="shopAdminAccessForm"><h2>SHOP 전용 비밀번호를 입력해 주세요.</h2><p class="completion-guide">아이디 입력 없이 2차 비밀번호만 확인합니다.</p><label>SHOP 2차 비밀번호<input type="password" name="password" autocomplete="off" required autofocus></label><button type="submit">SHOP 관리자 입장</button></form>
+      <p id="shopAdminAccessMessage" role="alert"></p>
+      <a class="home-link" href="#" onclick="logout();return false">로그아웃</a>
+    </section>
+  </main>
+  <script src="/js/common.js"></script>
+  <script>
+  (async()=>{
+    try{
+      const me=await api("/api/auth/me");
+      if(me.role!=="ADMIN"||!["SHOP_ADMIN","SUPER_ADMIN"].includes(me.adminRole)){location.replace("/admin.html")}
+    }catch(error){shopAdminAccessMessage.textContent=error.message}
+  })();
+  shopAdminAccessForm.onsubmit=async event=>{
+    event.preventDefault();const button=shopAdminAccessForm.querySelector("button");button.disabled=true;shopAdminAccessMessage.textContent="2차 비밀번호를 확인하고 있습니다.";
+    try{const result=await api("/api/shop-admin/access",{method:"POST",body:JSON.stringify({password:shopAdminAccessForm.password.value})});shopAdminAccessForm.reset();location.replace(result.next)}catch(error){shopAdminAccessMessage.textContent=error.message;shopAdminAccessForm.password.select();button.disabled=false}
+  };
+  </script>
+</body>
+</html>

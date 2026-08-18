@@ -26,7 +26,7 @@ import java.util.Set;
 
 @Service
 public class AdminAccountService {
-    private static final Set<String> ADMIN_ROLES=Set.of("SUPER_ADMIN","ADMIN");
+    private static final Set<String> ADMIN_ROLES=Set.of("SUPER_ADMIN","ADMIN","SHOP_ADMIN");
     private final JdbcTemplate jdbc;
     private final AppUserRepository users;
     private final PasswordEncoder encoder;
@@ -56,7 +56,7 @@ public class AdminAccountService {
             select id,email,name,admin_role,enabled,created_at,verified_at
             from app_users
             where role='ADMIN'
-            order by case when admin_role='SUPER_ADMIN' then 0 else 1 end,created_at
+            order by case admin_role when 'SUPER_ADMIN' then 0 when 'ADMIN' then 1 else 2 end,created_at
             """);
     }
 

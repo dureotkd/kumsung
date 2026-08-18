@@ -30,7 +30,7 @@
       if(!token)throw new Error("초대 또는 재설정 주소가 올바르지 않습니다.");
       const info=await api("/api/auth/admin-account?token="+encodeURIComponent(token));
       activationTitle.textContent=info.purpose==="INVITE"?"관리자 초대 수락":"관리자 비밀번호 재설정";
-      invitationInfo.textContent=`${info.name} · ${info.email} · ${info.admin_role==="SUPER_ADMIN"?"최고관리자":"일반관리자"}`;
+      invitationInfo.textContent=`${info.name} · ${info.email} · ${{SUPER_ADMIN:"최고관리자",ADMIN:"일반관리자",SHOP_ADMIN:"SHOP 관리자"}[info.admin_role]||info.admin_role}`;
       activationForm.hidden=false;authMessage.textContent="";
     }
     activationForm.onsubmit=async e=>{

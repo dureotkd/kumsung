@@ -5,7 +5,7 @@ document.querySelectorAll(".side-nav button").forEach(b=>b.onclick=()=>showView(
 const empty=t=>`<p class="empty">${t}</p>`;
 function table(rows,cols){if(!rows.length)return empty("등록된 내역이 없습니다.");return `<table class="table"><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${typeof c[2]==="function"?c[2](r[c[1]],r):esc(r[c[1]])}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
 let quotes=[];
-async function init(){const me=await api("/api/auth/me");if(me.role==="ADMIN"){location.replace("/admin.html");return}userName.textContent=me.name;companyName.textContent=me.companyName;const requested=location.hash.slice(1);await dashboard();if(requested&&requested!=="dashboard"&&titles[requested])showView(requested)}
+async function init(){const me=await api("/api/auth/me");if(me.role==="ADMIN"){location.replace(me.adminRole==="SHOP_ADMIN"?"/shop-admin-entry.html":"/admin.html");return}userName.textContent=me.name;companyName.textContent=me.companyName;const requested=location.hash.slice(1);await dashboard();if(requested&&requested!=="dashboard"&&titles[requested])showView(requested)}
 async function dashboard(){const [s,q]=await Promise.all([api("/api/portal/summary"),api("/api/portal/quotes?limit=5")]);quotes=q;sQuotes.textContent=s.quotes;sActive.textContent=s.active;sProjects.textContent=s.projects;sMessages.textContent=s.messages;recentQuotes.innerHTML=quoteRows(q)}
 function quoteRows(q){return table(q,[["접수번호","receipt_number",(v)=>`<button class="action" onclick="openQuote('${esc(v)}')">${esc(v)}</button>`],["제목","subject"],["제품/공종","product_type"],["상태","status",v=>`<span class="badge">${statusName[v]||v}</span>`],["접수일","created_at",fmt]])}
 async function loadView(id){try{

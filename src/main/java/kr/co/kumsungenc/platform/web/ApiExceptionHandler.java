@@ -43,6 +43,14 @@ public class ApiExceptionHandler {
         return response(HttpStatus.CONFLICT,"이미 등록된 값이거나 현재 데이터 관계와 충돌합니다.");
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    ResponseEntity<Map<String,String>> unavailable(IllegalStateException exception){
+        log.warn("일시적으로 사용할 수 없는 기능: {}",exception.getMessage());
+        String message=exception.getMessage()==null||exception.getMessage().isBlank()
+            ?"현재 서비스를 사용할 수 없습니다.":exception.getMessage();
+        return response(HttpStatus.SERVICE_UNAVAILABLE,message);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     ResponseEntity<Map<String,String>> forbidden(AccessDeniedException exception){
         String message=exception.getMessage()==null||exception.getMessage().isBlank()

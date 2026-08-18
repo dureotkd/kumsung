@@ -14,31 +14,6 @@ public class AdminContentController {
     private final ManagedContentService service;
     public AdminContentController(ManagedContentService service){this.service=service;}
 
-    @GetMapping("/shop-products")
-    public List<Map<String,Object>> products(@RequestParam(defaultValue="25") int limit,@RequestParam(defaultValue="0") int offset){
-        return service.adminProducts(limit,offset);
-    }
-
-    @PostMapping(value="/shop-products",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Map<String,Object> createProduct(@RequestParam String code,@RequestParam String name,
-        @RequestParam(required=false) String category,@RequestParam(required=false) String description,
-        @RequestParam(defaultValue="0") int displayOrder,@RequestParam(defaultValue="true") boolean active,
-        @RequestPart(required=false) MultipartFile image) throws IOException{
-        return service.createProduct(code,name,category,description,displayOrder,active,image);
-    }
-
-    @PutMapping(value="/shop-products/{id}",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Map<String,Object> updateProduct(@PathVariable long id,@RequestParam String code,@RequestParam String name,
-        @RequestParam(required=false) String category,@RequestParam(required=false) String description,
-        @RequestParam(defaultValue="0") int displayOrder,@RequestParam(defaultValue="true") boolean active,
-        @RequestPart(required=false) MultipartFile image) throws IOException{
-        return service.updateProduct(id,code,name,category,description,displayOrder,active,image);
-    }
-
-    @PutMapping("/shop-products/{id}/status") public Map<String,String> productStatus(@PathVariable long id,@RequestBody Status body){
-        service.productStatus(id,body.active());return Map.of("message","제품 공개 상태를 변경했습니다.");
-    }
-
     @GetMapping("/innovation")
     public List<Map<String,Object>> innovation(@RequestParam(defaultValue="25") int limit,@RequestParam(defaultValue="0") int offset){
         return service.adminInnovation(limit,offset);
@@ -79,7 +54,6 @@ public class AdminContentController {
         service.deletePost(id);return Map.of("message","게시물을 삭제했습니다.");
     }
 
-    public record Status(boolean active){}
     public record Published(boolean published){}
     public record PostStatus(boolean published,boolean pinned){}
 }

@@ -4,7 +4,11 @@ const shopMessage=document.querySelector("#shopMessage");
 const shopDialog=document.querySelector("#shopSuccess");
 const shopQuickNav=document.querySelector("#shopQuickNav");
 const shopSelectionCount=document.querySelector("#shopSelectionCount");
+const checkoutDialog=document.querySelector("#shopCheckout");
+const checkoutForm=document.querySelector("#shopCheckoutForm");
+const paymentBadge=document.querySelector("#shopPaymentBadge");
 let products=[];
+let paymentConfig={ready:false,mode:"TEST",testMode:true};
 const newShopSubmissionKey=()=>globalThis.crypto?.randomUUID?.()||"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&3|8)).toString(16)});
 let shopSubmissionKey=newShopSubmissionKey();
 
@@ -16,8 +20,9 @@ function renderProducts(){
   products.forEach(product=>{const category=product.category||"주문제작";if(!groupMap.has(category)){const group={category,items:[]};groupMap.set(category,group);groups.push(group)}groupMap.get(category).items.push(product)});
   shopQuickNav.innerHTML=groups.map((group,index)=>`<a href="#shop-category-${index+1}">${esc(group.category)}</a>`).join("");
   let productIndex=0;
-  productHost.innerHTML=groups.map((group,groupIndex)=>`<section id="shop-category-${groupIndex+1}" class="sync-category"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-cat-num">${String(groupIndex+1).padStart(2,"0")}</span><h2>${esc(group.category)}</h2></div></div><p class="sync-section-desc">${esc(group.category)} 제품을 선택해 제작 문의를 남겨 주세요.</p><div class="sync-item-list">${group.items.map(product=>{productIndex++;return `<article class="sync-item">
-    <label class="sync-product-summary"><span class="sync-thumb">${product.imageUrl?`<img src="${esc(product.imageUrl)}" alt="" loading="lazy">`:esc(product.name.slice(0,1))}</span><span class="sync-product-copy"><strong class="sync-product-name">${esc(product.name)}</strong><small class="sync-product-spec">${esc(product.description||product.code)}</small></span><span class="sync-tag">${String(productIndex).padStart(2,"0")}</span><input type="checkbox" data-id="${product.id}" aria-label="${esc(product.name)} 선택" ${requested===product.code?"checked":""}></label>
+  productHost.innerHTML=groups.map((group,groupIndex)=>`<section id="shop-category-${groupIndex+1}" class="sync-category"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-cat-num">${String(groupIndex+1).padStart(2,"0")}</span><h2>${esc(group.category)}</h2></div></div><p class="sync-section-desc">${esc(group.category)} 제품을 구매하거나 제작 문의로 선택해 주세요.</p><div class="sync-item-list">${group.items.map(product=>{productIndex++;const purchasable=Number(product.price)>0;return `<article class="sync-item">
+    <label class="sync-product-summary"><span class="sync-thumb">${product.imageUrl?`<img src="${esc(product.imageUrl)}" alt="" loading="lazy">`:esc(product.name.slice(0,1))}</span><span class="sync-product-copy"><strong class="sync-product-name">${esc(product.name)}</strong><small class="sync-product-spec">${esc(product.description||product.code)}</small><strong class="sync-product-price">${product.price==null?"가격 문의":`${Number(product.price).toLocaleString("ko-KR")}원`}</strong></span><span class="sync-tag">${String(productIndex).padStart(2,"0")}</span><input type="checkbox" data-id="${product.id}" aria-label="${esc(product.name)} 선택" ${requested===product.code?"checked":""}></label>
+    ${purchasable?`<div class="sync-product-buy"><span>${paymentConfig.testMode?"TEST · 실제 금액 미차감":"토스페이먼츠 결제"}</span><button type="button" data-buy="${product.id}" ${paymentConfig.ready?"":"disabled"}>${paymentConfig.ready?"구매하기":"결제 준비 중"}</button></div>`:""}
     <div class="sync-product-options" ${requested===product.code?"":"hidden"}>
       <label>도면·이미지 업로드 <small>선택, PDF·JPG·PNG·DWG·DXF</small><input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf" data-files></label>
       <label>수량<input type="number" min="1" max="999" value="1" data-quantity></label>
@@ -39,6 +44,36 @@ async function loadProducts(){
   if(!response.ok)throw new Error("제품 정보를 불러오지 못했습니다.");
   products=await response.json();renderProducts();
 }
+
+async function loadPaymentConfig(){
+  const response=await fetch("/api/public/shop/payment/config");if(!response.ok)throw new Error("결제 설정을 불러오지 못했습니다.");
+  paymentConfig=await response.json();paymentBadge.textContent=paymentConfig.ready?(paymentConfig.testMode?"테스트 결제 가능":"결제 가능"):"결제 준비 중";paymentBadge.classList.toggle("test",Boolean(paymentConfig.testMode));
+}
+
+productHost.addEventListener("click",event=>{
+  const button=event.target.closest("[data-buy]");if(!button)return;
+  const product=products.find(item=>Number(item.id)===Number(button.dataset.buy));if(!product||!paymentConfig.ready)return;
+  checkoutForm.reset();checkoutForm.productId.value=product.id;checkoutForm.quantity.value=1;checkoutProductName.textContent=product.name;checkoutDialog.dataset.unitPrice=product.price;updateCheckoutAmount();checkoutMessage.textContent="";checkoutDialog.showModal();
+});
+function updateCheckoutAmount(){const quantity=Number(checkoutForm.quantity.value)||0;const unitPrice=Number(checkoutDialog.dataset.unitPrice)||0;checkoutAmount.textContent=`${(quantity*unitPrice).toLocaleString("ko-KR")}원`}
+checkoutForm.quantity.addEventListener("input",updateCheckoutAmount);
+checkoutDialog.querySelector("[data-checkout-close]").onclick=()=>checkoutDialog.close();
+checkoutDialog.addEventListener("click",event=>{if(event.target===checkoutDialog)checkoutDialog.close()});
+
+checkoutForm.addEventListener("submit",async event=>{
+  event.preventDefault();checkoutMessage.textContent="";if(!checkoutForm.reportValidity())return;
+  const button=checkoutForm.querySelector('button[type="submit"]');button.disabled=true;button.textContent="주문을 생성하고 있습니다...";
+  try{
+    if(typeof TossPayments!=="function")throw new Error("토스페이먼츠 결제 모듈을 불러오지 못했습니다.");
+    const data=Object.fromEntries(new FormData(checkoutForm));data.productId=Number(data.productId);data.quantity=Number(data.quantity);data.privacyAgreed=checkoutForm.privacyAgreed.checked;
+    const csrf=await fetch("/api/auth/csrf").then(response=>response.json());
+    const response=await fetch("/api/public/shop/orders",{method:"POST",headers:{"Content-Type":"application/json",[csrf.headerName]:csrf.token},body:JSON.stringify(data)});
+    const order=await response.json();if(!response.ok)throw new Error(order.message||"주문 생성에 실패했습니다.");
+    checkoutMessage.textContent="토스페이먼츠 결제창을 여는 중입니다.";
+    const tossPayments=TossPayments(order.clientKey);const payment=tossPayments.payment({customerKey:order.customerKey});
+    await payment.requestPayment({method:"CARD",amount:{currency:"KRW",value:Number(order.amount)},orderId:order.orderId,orderName:order.orderName,customerName:order.customerName,customerEmail:order.customerEmail,customerMobilePhone:order.customerMobilePhone,successUrl:`${location.origin}/shop-payment-success.html`,failUrl:`${location.origin}/shop-payment-fail.html`});
+  }catch(error){checkoutMessage.textContent=error.message;button.disabled=false;button.textContent="토스페이먼츠로 결제하기"}
+});
 
 shopForm.addEventListener("submit",async(event)=>{
   event.preventDefault();shopMessage.textContent="";if(!shopForm.reportValidity())return;
@@ -72,4 +107,4 @@ shopForm.addEventListener("submit",async(event)=>{
 });
 
 shopDialog.querySelector("button").addEventListener("click",()=>shopDialog.close());
-loadProducts().catch((error)=>{shopMessage.textContent=error.message;});
+Promise.all([loadPaymentConfig(),loadProducts()]).then(renderProducts).catch((error)=>{shopMessage.textContent=error.message;});

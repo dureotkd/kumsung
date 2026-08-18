@@ -33,7 +33,7 @@ public class AdminAccountController {
     public record InvitationRequest(
         @NotBlank @Email @Size(max=120) String email,
         @NotBlank @Size(max=60) String name,
-        @NotBlank @Pattern(regexp="SUPER_ADMIN|ADMIN") String adminRole){}
+        @NotBlank @Pattern(regexp="SUPER_ADMIN|ADMIN|SHOP_ADMIN") String adminRole){}
 
     @PostMapping("/invitations")
     public ResponseEntity<Map<String,String>> invite(@Valid @RequestBody InvitationRequest body,
@@ -42,7 +42,7 @@ public class AdminAccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message","관리자 초대 메일을 발송 대기열에 등록했습니다."));
     }
 
-    public record RoleRequest(@NotBlank @Pattern(regexp="SUPER_ADMIN|ADMIN") String adminRole){}
+    public record RoleRequest(@NotBlank @Pattern(regexp="SUPER_ADMIN|ADMIN|SHOP_ADMIN") String adminRole){}
     @PutMapping("/{id}/role")
     public Map<String,String> role(@PathVariable long id,@Valid @RequestBody RoleRequest body,
             Principal principal,HttpServletRequest request){

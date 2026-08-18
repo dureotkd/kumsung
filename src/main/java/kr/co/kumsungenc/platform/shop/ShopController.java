@@ -15,10 +15,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/public/shop")
 public class ShopController {
-    private final JdbcTemplate jdbc;private final ShopInquiryService service;private final ClientIpResolver clientIpResolver;private final ManagedContentService content;
-    public ShopController(JdbcTemplate jdbc,ShopInquiryService service,ClientIpResolver clientIpResolver,ManagedContentService content){this.jdbc=jdbc;this.service=service;this.clientIpResolver=clientIpResolver;this.content=content;}
+    private final JdbcTemplate jdbc;private final ShopInquiryService service;private final ClientIpResolver clientIpResolver;private final ManagedContentService content;private final ShopPaymentService payments;
+    public ShopController(JdbcTemplate jdbc,ShopInquiryService service,ClientIpResolver clientIpResolver,ManagedContentService content,ShopPaymentService payments){this.jdbc=jdbc;this.service=service;this.clientIpResolver=clientIpResolver;this.content=content;this.payments=payments;}
     @GetMapping("/products") public List<Map<String,Object>> products(){
-        List<Map<String,Object>> rows=jdbc.queryForList("select id,code,name,category,description,image_url,image_key from shop_products where active=true order by display_order,id");
+        List<Map<String,Object>> rows=jdbc.queryForList("select id,code,name,category,description,price,image_url,image_key from shop_products where active=true order by display_order,id");
         rows.forEach(row->row.put("imageUrl",row.get("image_key")!=null?"/api/public/shop/products/"+row.get("id")+"/image":row.get("image_url")));
         return rows;
     }
@@ -33,4 +33,10 @@ public class ShopController {
         @RequestPart(value="files",required=false) List<MultipartFile> files,HttpServletRequest request) throws IOException{
         return service.submit(body,files==null?List.of():files,clientIpResolver.resolve(request),request.getHeader("User-Agent"));
     }
+    @GetMapping("/payment/config") public Map<String,Object> paymentConfig(){return payments.publicConfig();}
+    @PostMapping("/orders") public Map<String,Object> createOrder(@RequestBody ShopPaymentService.CreateOrder body,
+        java.security.Principal principal,HttpServletRequest request){return payments.create(body,principal,
+            clientIpResolver.resolve(request),request.getHeader("User-Agent"));}
+    @PostMapping("/payments/confirm") public Map<String,Object> confirmPayment(
+        @RequestBody ShopPaymentService.ConfirmOrder body){return payments.confirm(body);}
 }

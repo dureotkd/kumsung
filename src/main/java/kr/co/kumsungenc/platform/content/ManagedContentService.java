@@ -32,7 +32,7 @@ public class ManagedContentService {
 
     public List<Map<String,Object>> adminProducts(int limit,int offset){
         List<Map<String,Object>> rows=jdbc.queryForList("""
-            select id,code,name,category,description,active,display_order,image_url,
+            select id,code,name,category,description,price,active,display_order,image_url,
                    image_key,image_original_name,image_content_type,image_size,created_at,updated_at
             from shop_products order by display_order,id limit ? offset ?
             """,pageSize(limit),pageOffset(offset));
@@ -41,7 +41,7 @@ public class ManagedContentService {
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public Map<String,Object> createProduct(String code,String name,String category,String description,
+    public Map<String,Object> createProduct(String code,String name,String category,String description,Long price,
         int displayOrder,boolean active,MultipartFile image) throws IOException{
         String cleanCode=productCode(code),cleanName=required(name,"제품명",120);
         String imageKey=null,originalName=null,contentType=null;Long imageSize=null;
@@ -51,15 +51,15 @@ public class ManagedContentService {
             storage.store(image,imageKey);originalName=originalName(image);contentType=contentType(image);imageSize=image.getSize();
         }
         Long id=jdbc.queryForObject("""
-            insert into shop_products(code,name,category,description,active,display_order,image_key,image_original_name,image_content_type,image_size)
-            values(?,?,?,?,?,?,?,?,?,?) returning id
-            """,Long.class,cleanCode,cleanName,optional(category,80),optional(description,500),active,displayOrder,
+            insert into shop_products(code,name,category,description,price,active,display_order,image_key,image_original_name,image_content_type,image_size)
+            values(?,?,?,?,?,?,?,?,?,?,?) returning id
+            """,Long.class,cleanCode,cleanName,optional(category,80),optional(description,500),price(price),active,displayOrder,
             imageKey,originalName,contentType,imageSize);
         return product(id);
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public Map<String,Object> updateProduct(long id,String code,String name,String category,String description,
+    public Map<String,Object> updateProduct(long id,String code,String name,String category,String description,Long price,
         int displayOrder,boolean active,MultipartFile image) throws IOException{
         Map<String,Object> before=product(id);
         String newKey=null,originalName=null,contentType=null;Long imageSize=null;
@@ -68,15 +68,15 @@ public class ManagedContentService {
             newKey=StorageKeys.shopProduct(reference,UUID.randomUUID()+"."+ext);
             storage.store(image,newKey);originalName=originalName(image);contentType=contentType(image);imageSize=image.getSize();
             jdbc.update("""
-                update shop_products set code=?,name=?,category=?,description=?,display_order=?,active=?,image_url=null,
+                update shop_products set code=?,name=?,category=?,description=?,price=?,display_order=?,active=?,image_url=null,
                     image_key=?,image_original_name=?,image_content_type=?,image_size=?,updated_at=current_timestamp where id=?
-                """,productCode(code),required(name,"제품명",120),optional(category,80),optional(description,500),displayOrder,active,
+                """,productCode(code),required(name,"제품명",120),optional(category,80),optional(description,500),price(price),displayOrder,active,
                 newKey,originalName,contentType,imageSize,id);
             deleteAfterCommit((String)before.get("image_key"));
         }else{
             jdbc.update("""
-                update shop_products set code=?,name=?,category=?,description=?,display_order=?,active=?,updated_at=current_timestamp where id=?
-                """,productCode(code),required(name,"제품명",120),optional(category,80),optional(description,500),displayOrder,active,id);
+                update shop_products set code=?,name=?,category=?,description=?,price=?,display_order=?,active=?,updated_at=current_timestamp where id=?
+                """,productCode(code),required(name,"제품명",120),optional(category,80),optional(description,500),price(price),displayOrder,active,id);
         }
         return product(id);
     }
@@ -89,7 +89,7 @@ public class ManagedContentService {
 
     public Map<String,Object> product(long id){
         Map<String,Object> row=one("""
-            select id,code,name,category,description,active,display_order,image_url,image_key,
+            select id,code,name,category,description,price,active,display_order,image_url,image_key,
                    image_original_name,image_content_type,image_size,created_at,updated_at
             from shop_products where id=?
             """,id);
@@ -255,6 +255,10 @@ public class ManagedContentService {
         String clean=required(value,"제품 코드",40).toUpperCase(Locale.ROOT);
         if(!clean.matches("[A-Z0-9_]{2,40}"))throw new IllegalArgumentException("제품 코드는 영문 대문자, 숫자, 밑줄만 사용할 수 있습니다.");
         return clean;
+    }
+    private Long price(Long value){
+        if(value!=null&&value<0)throw new IllegalArgumentException("제품 가격은 0원 이상으로 입력해 주세요.");
+        return value;
     }
     private String postType(String type){
         String clean=type==null?"":type.toUpperCase(Locale.ROOT);
