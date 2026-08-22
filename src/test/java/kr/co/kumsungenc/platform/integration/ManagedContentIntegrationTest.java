@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -56,6 +57,19 @@ class ManagedContentIntegrationTest {
                 .with(user("shop@example.com").authorities(new SimpleGrantedAuthority("ADMIN_SCOPE_SHOP_ADMIN"))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(greaterThanOrEqualTo(25)));
+    }
+
+    @Test
+    void administratorPageUsesRequestedCenterNamesAndOmitsBusinessRegistration() throws Exception {
+        String page=mvc.perform(get("/admin.html").with(user("admin@example.com").roles("ADMIN")))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(page)
+            .contains("data-view=\"innovation\">기술혁신센터")
+            .contains("data-view=\"media\">홍보센터")
+            .contains("기술혁신센터 자료 업로드")
+            .doesNotContain("data-view=\"business\"")
+            .doesNotContain("id=\"business\"");
     }
 
     @Test
