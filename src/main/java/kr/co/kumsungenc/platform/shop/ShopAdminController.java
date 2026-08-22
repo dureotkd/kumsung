@@ -69,6 +69,12 @@ public class ShopAdminController {
     @GetMapping("/orders") public List<Map<String,Object>> orders(@RequestParam(defaultValue="25") int limit,
             @RequestParam(defaultValue="0") int offset){return orderPayments.adminOrders(limit,offset);}
 
+    @PostMapping("/orders/{id}/cancel")
+    public Map<String,Object> cancelOrder(@PathVariable long id,@RequestBody ShopPaymentService.CancelOrder body,
+            Principal principal,HttpServletRequest request){
+        return orderPayments.cancel(id,body,principal.getName(),clientIpResolver.resolve(request));
+    }
+
     @PutMapping("/toss-payments")
     public Map<String,Object> updateTossPayments(@RequestBody TossSettings body,Principal principal,
             HttpServletRequest request){

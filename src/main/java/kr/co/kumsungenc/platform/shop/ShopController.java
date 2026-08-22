@@ -39,4 +39,6 @@ public class ShopController {
             clientIpResolver.resolve(request),request.getHeader("User-Agent"));}
     @PostMapping("/payments/confirm") public Map<String,Object> confirmPayment(
         @RequestBody ShopPaymentService.ConfirmOrder body){return payments.confirm(body);}
+    @PostMapping("/payments/fail") public Map<String,Object> failPayment(
+        @RequestBody ShopPaymentService.FailedOrder body){return payments.fail(body);}
 }

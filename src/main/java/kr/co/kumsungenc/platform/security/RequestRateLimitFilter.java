@@ -26,7 +26,7 @@ public class RequestRateLimitFilter extends OncePerRequestFilter {
         else if("/api/auth/admin-account".equals(path)){limit=10;seconds=900;}
         else if("/api/quotes".equals(path)){limit=20;seconds=3600;}
         else if("/api/public/shop/inquiries".equals(path)||"/api/public/support".equals(path)){limit=10;seconds=3600;}
-        else if("/api/public/shop/orders".equals(path)||"/api/public/shop/payments/confirm".equals(path)){limit=20;seconds=900;}
+        else if("/api/public/shop/orders".equals(path)||path.startsWith("/api/public/shop/payments/")){limit=20;seconds=900;}
         else if(path.matches("/api/public/content/innovation/\\d+/download")){limit=20;seconds=900;}
         else{chain.doFilter(request,response);return;}
         String ip=clientIpResolver.resolve(request);

@@ -52,6 +52,7 @@ app:
   shop-admin:
     access-password: ${SHOP_ADMIN_ACCESS_PASSWORD:}
   toss-payments:
+    client-key: ${TOSS_CLIENT_KEY:}
     secret-key: ${TOSS_SECRET_KEY:}
   email-outbox:
     enabled: ${EMAIL_OUTBOX_ENABLED:true}

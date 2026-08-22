@@ -12,11 +12,14 @@ import java.util.Map;
 @Service
 public class TossPaymentsSettingsService {
     private final JdbcTemplate jdbc;
+    private final String configuredClientKey;
     private final String secretKey;
 
     public TossPaymentsSettingsService(JdbcTemplate jdbc,
+            @Value("${app.toss-payments.client-key:}") String configuredClientKey,
             @Value("${app.toss-payments.secret-key:}") String secretKey) {
         this.jdbc=jdbc;
+        this.configuredClientKey=configuredClientKey==null?"":configuredClientKey.trim();
         this.secretKey=secretKey==null?"":secretKey.trim();
     }
 
@@ -26,7 +29,8 @@ public class TossPaymentsSettingsService {
             from shop_payment_settings where id=1
             """));
         String mode=(String)row.get("mode");
-        String clientKey=(String)row.get("client_key");
+        String storedClientKey=(String)row.get("client_key");
+        String clientKey=configuredClientKey.isBlank()?storedClientKey:configuredClientKey;
         String clientMode=keyMode(clientKey,"ck");
         String secretMode=keyMode(secretKey,"sk");
         String clientFamily=keyFamily(clientKey,"ck");
@@ -36,6 +40,7 @@ public class TossPaymentsSettingsService {
         boolean keyPairMatches=clientKeyConfigured&&secretKeyConfigured
             &&mode.equals(clientMode)&&mode.equals(secretMode)&&clientFamily.equals(secretFamily);
         row.put("clientKey",clientKey==null?"":clientKey);
+        row.put("clientKeyManagedByEnvironment",!configuredClientKey.isBlank());
         row.put("clientKeyConfigured",clientKeyConfigured);
         row.put("secretKeyConfigured",secretKeyConfigured);
         row.put("secretKeyMode",secretMode==null?"":secretMode);
@@ -52,6 +57,8 @@ public class TossPaymentsSettingsService {
         if(!cleanMode.equals("TEST")&&!cleanMode.equals("LIVE"))
             throw new IllegalArgumentException("결제 모드는 테스트 또는 라이브만 선택할 수 있습니다.");
         String cleanClient=clientKey==null?"":clientKey.trim();
+        if(!configuredClientKey.isBlank()&&!configuredClientKey.equals(cleanClient))
+            throw new IllegalArgumentException("클라이언트 키는 서버 환경변수에서 관리되고 있습니다.");
         if(cleanClient.length()>200)throw new IllegalArgumentException("클라이언트 키가 너무 깁니다.");
         String clientMode=keyMode(cleanClient,"ck");
         if(!cleanClient.isEmpty()&&clientMode==null)

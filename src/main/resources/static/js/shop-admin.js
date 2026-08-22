@@ -45,7 +45,7 @@ shopAdminProductForm.onsubmit=async event=>{
 
 async function loadTossSettings(){
   try{
-    const settings=await api("/api/shop-admin/toss-payments");tossSettingsForm.mode.value=settings.mode;tossSettingsForm.clientKey.value=settings.clientKey||"";tossSettingsForm.enabled.checked=Boolean(settings.enabled);
+    const settings=await api("/api/shop-admin/toss-payments");tossSettingsForm.mode.value=settings.mode;tossSettingsForm.clientKey.value=settings.clientKey||"";tossSettingsForm.clientKey.readOnly=Boolean(settings.clientKeyManagedByEnvironment);tossSettingsForm.enabled.checked=Boolean(settings.enabled);
     tossReadyBadge.textContent=settings.ready?"사용 준비 완료":settings.enabled?"설정 확인 필요":"비활성";tossReadyBadge.className=`badge ${settings.ready?"ok":"warn"}`;
     tossStatusGrid.innerHTML=[
       ["운영 모드",settings.mode==="LIVE"?"라이브":"테스트",settings.mode==="LIVE"?"실결제용 설정":"가상 결제 검증용"],
@@ -60,9 +60,15 @@ async function loadShopOrders(){
   try{
     const page=await apiPage("/api/shop-admin/orders","shop-admin-orders");
     const status=value=>({READY:"결제 대기",PAID:"결제 완료",FAILED:"결제 실패",CANCELED:"취소"}[value]||value);
-    const html=shopTable(page.items,[["주문일","created_at",value=>fmt(value)],["주문번호","order_id",value=>`<small>${esc(value)}</small>`],["제품","product_name",(value,row)=>`<strong>${esc(value)}</strong><br><small>${esc(row.product_code)} · ${row.quantity}개</small>`],["결제금액","amount",value=>`<strong class="price-cell">${won(value)}</strong>`],["구매자·배송","buyer_name",(value,row)=>`${esc(value)}<br><small>${esc(row.buyer_phone)}<br>${esc(row.buyer_email)}<br>${esc(row.delivery_address)}</small>`],["상태","status",value=>`<span class="badge ${value==="PAID"?"ok":"warn"}">${esc(status(value))}</span>`],["영수증","receipt_url",value=>value?`<a class="action" href="${esc(value)}" target="_blank" rel="noopener">보기</a>`:"-"]]);
+    const html=shopTable(page.items,[["주문일","created_at",value=>fmt(value)],["주문번호","order_id",value=>`<small>${esc(value)}</small>`],["제품","product_name",(value,row)=>`<strong>${esc(value)}</strong><br><small>${esc(row.product_code)} · ${row.quantity}개</small>`],["결제금액","amount",value=>`<strong class="price-cell">${won(value)}</strong>`],["구매자·배송","buyer_name",(value,row)=>`${esc(value)}<br><small>${esc(row.buyer_phone)}<br>${esc(row.buyer_email)}<br>${esc(row.delivery_address)}</small>`],["상태","status",(value,row)=>`<span class="badge ${value==="PAID"?"ok":"warn"}" title="${esc(row.failure_message||row.cancel_reason||"")}">${esc(status(value))}</span>`],["영수증","receipt_url",value=>value?`<a class="action" href="${esc(value)}" target="_blank" rel="noopener">보기</a>`:"-"],["관리","id",(value,row)=>row.status==="PAID"?`<button class="action" onclick="cancelShopOrder(${value})">결제 취소</button>`:"-"]]);
     renderPage(shopOrderTable,"shop-admin-orders",page,html,loadShopOrders);
   }catch(error){shopNotify(error.message)}
+}
+
+async function cancelShopOrder(id){
+  const reason=prompt("구매자와 결제 내역에 남길 전액 취소 사유를 입력해 주세요.");if(reason===null)return;if(!reason.trim()){shopNotify("취소 사유를 입력해 주세요.");return}
+  if(!confirm("이 결제를 토스페이먼츠에서 전액 취소하시겠습니까?"))return;
+  try{await api(`/api/shop-admin/orders/${id}/cancel`,{method:"POST",body:JSON.stringify({reason:reason.trim()})});shopNotify("결제를 취소했습니다.");await loadShopOrders()}catch(error){shopNotify(error.message)}
 }
 
 tossSettingsForm.onsubmit=async event=>{

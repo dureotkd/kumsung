@@ -15,5 +15,6 @@ load_secret() {
 load_secret MAIL_PASSWORD
 load_secret DB_PASSWORD
 load_secret ADMIN_PASSWORD
+load_secret TOSS_SECRET_KEY
 
 exec java -XX:MaxRAMPercentage=75 -jar /app/app.jar

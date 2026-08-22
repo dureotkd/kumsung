@@ -48,6 +48,10 @@ async function loadProducts(){
 async function loadPaymentConfig(){
   const response=await fetch("/api/public/shop/payment/config");if(!response.ok)throw new Error("결제 설정을 불러오지 못했습니다.");
   paymentConfig=await response.json();paymentBadge.textContent=paymentConfig.ready?(paymentConfig.testMode?"테스트 결제 가능":"결제 가능"):"결제 준비 중";paymentBadge.classList.toggle("test",Boolean(paymentConfig.testMode));
+  shopPaymentEyebrow.textContent=`SMART SHOP · TOSS PAYMENTS ${paymentConfig.testMode?"TEST":""}`.trim();
+  shopPaymentIntro.textContent=paymentConfig.testMode?"가격이 등록된 제품은 토스페이먼츠 테스트 결제로 바로 구매할 수 있습니다. 실제 금액은 차감되지 않습니다.":"가격이 등록된 제품은 토스페이먼츠로 바로 구매할 수 있습니다. 주문제작 제품은 제작 문의를 남겨 주세요.";
+  shopPaymentFooter.textContent=paymentConfig.testMode?"© 2026 KUMSUNG ENC CO., LTD. · 현재 토스페이먼츠 테스트 결제로 실제 금액은 차감되지 않습니다.":"© 2026 KUMSUNG ENC CO., LTD. · 안전한 결제는 토스페이먼츠에서 처리됩니다.";
+  checkoutPaymentMode.textContent=paymentConfig.testMode?"TEST PAYMENT":"TOSS PAYMENT";checkoutPaymentNotice.textContent=paymentConfig.testMode?"테스트 결제로 실제 금액은 차감되지 않습니다.":"토스페이먼츠 결제창에서 안전하게 결제합니다.";
 }
 
 productHost.addEventListener("click",event=>{
@@ -63,16 +67,18 @@ checkoutDialog.addEventListener("click",event=>{if(event.target===checkoutDialog
 checkoutForm.addEventListener("submit",async event=>{
   event.preventDefault();checkoutMessage.textContent="";if(!checkoutForm.reportValidity())return;
   const button=checkoutForm.querySelector('button[type="submit"]');button.disabled=true;button.textContent="주문을 생성하고 있습니다...";
+  let csrf=null;let createdOrder=null;
   try{
     if(typeof TossPayments!=="function")throw new Error("토스페이먼츠 결제 모듈을 불러오지 못했습니다.");
     const data=Object.fromEntries(new FormData(checkoutForm));data.productId=Number(data.productId);data.quantity=Number(data.quantity);data.privacyAgreed=checkoutForm.privacyAgreed.checked;
-    const csrf=await fetch("/api/auth/csrf").then(response=>response.json());
+    csrf=await fetch("/api/auth/csrf").then(response=>response.json());
     const response=await fetch("/api/public/shop/orders",{method:"POST",headers:{"Content-Type":"application/json",[csrf.headerName]:csrf.token},body:JSON.stringify(data)});
-    const order=await response.json();if(!response.ok)throw new Error(order.message||"주문 생성에 실패했습니다.");
+    createdOrder=await response.json();if(!response.ok)throw new Error(createdOrder.message||"주문 생성에 실패했습니다.");
     checkoutMessage.textContent="토스페이먼츠 결제창을 여는 중입니다.";
-    const tossPayments=TossPayments(order.clientKey);const payment=tossPayments.payment({customerKey:order.customerKey});
-    await payment.requestPayment({method:"CARD",amount:{currency:"KRW",value:Number(order.amount)},orderId:order.orderId,orderName:order.orderName,customerName:order.customerName,customerEmail:order.customerEmail,customerMobilePhone:order.customerMobilePhone,successUrl:`${location.origin}/shop-payment-success.html`,failUrl:`${location.origin}/shop-payment-fail.html`});
-  }catch(error){checkoutMessage.textContent=error.message;button.disabled=false;button.textContent="토스페이먼츠로 결제하기"}
+    checkoutDialog.close();
+    const tossPayments=TossPayments(createdOrder.clientKey);const payment=tossPayments.payment({customerKey:createdOrder.customerKey});
+    await payment.requestPayment({method:"CARD",amount:{currency:"KRW",value:Number(createdOrder.amount)},orderId:createdOrder.orderId,orderName:createdOrder.orderName,customerName:createdOrder.customerName,customerEmail:createdOrder.customerEmail,customerMobilePhone:createdOrder.customerMobilePhone,successUrl:`${location.origin}/shop-payment-success.html`,failUrl:`${location.origin}/shop-payment-fail.html?orderId=${encodeURIComponent(createdOrder.orderId)}`});
+  }catch(error){const code=String(error?.code||"PAYMENT_WINDOW_ERROR").slice(0,80);const message=String(error?.message||"결제창을 열지 못했습니다.").slice(0,300);if(createdOrder?.orderId&&csrf){try{await fetch("/api/public/shop/payments/fail",{method:"POST",headers:{"Content-Type":"application/json",[csrf.headerName]:csrf.token},body:JSON.stringify({orderId:createdOrder.orderId,code,message})})}catch(_){/* 구매자 안내를 우선하고 서버 기록은 실패 URL에서도 재시도합니다. */}}checkoutMessage.textContent=`[${code}] ${message}`;if(!checkoutDialog.open)checkoutDialog.showModal();button.disabled=false;button.textContent="토스페이먼츠로 결제하기"}
 });
 
 shopForm.addEventListener("submit",async(event)=>{

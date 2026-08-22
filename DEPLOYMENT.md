@@ -19,6 +19,8 @@ chmod 600 .env.production
 
 `.env.production`의 예시 값을 실제 값으로 교체합니다. `ADMIN_EMAIL`, `ADMIN_PASSWORD`는 최초 최고관리자 생성 때만 사용합니다. 이 파일은 Git에 포함되지 않습니다.
 
+토스페이먼츠는 `.env.production`의 `TOSS_CLIENT_KEY`에 공개 클라이언트 키를 넣고, 서버 시크릿 키는 `.secrets/toss_secret_key` 파일에 한 줄로 저장합니다. 두 키는 같은 MID의 같은 테스트·라이브 모드 및 같은 연동 유형이어야 합니다. 실제 결제 전에는 SHOP 관리자에서 모드와 활성화 상태를 확인합니다.
+
 ## 3. 배포
 
 ```bash
@@ -35,6 +37,7 @@ docker compose --env-file .env.production -f compose.prod.yml ps
 - 테스트 고객 이메일 인증
 - 정상 PDF 접수와 위장 파일 차단
 - 고객·담당자 이메일 수신
+- 토스페이먼츠 테스트 결제 승인, 실패 기록, 영수증 확인 및 관리자 전액 취소
 - 견적서 PDF·Excel 자동 생성 및 두 파일 다운로드
 - 계약서 수락·거절 기록과 알림
 

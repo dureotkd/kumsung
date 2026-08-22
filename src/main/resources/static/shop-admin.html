@@ -66,7 +66,7 @@
           <div class="managed-actions"><button class="action" type="submit">결제 설정 저장</button><button class="action secondary" type="button" onclick="loadTossSettings()">설정 다시 불러오기</button></div>
         </form>
       </div>
-      <div class="panel"><div class="panel-head"><div><h2>주문·결제 내역</h2><p class="smtp-help">SMART SHOP에서 생성된 주문과 토스페이먼츠 승인 상태입니다.</p></div><button class="action" type="button" onclick="loadShopOrders()">새로고침</button></div><div id="shopOrderTable"></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>주문·결제 내역</h2><p class="smtp-help">결제 승인·실패·사용자 취소 상태와 영수증을 확인하고, 결제 완료 건은 전액 취소할 수 있습니다.</p></div><button class="action" type="button" onclick="loadShopOrders()">새로고침</button></div><div id="shopOrderTable"></div></div>
       <div class="panel payment-guide"><h2>라이브 전환 전 확인</h2><ol><li>현재 공용 테스트 키로 주문 생성·결제 승인·영수증 흐름을 검증합니다.</li><li>전자결제 계약 후 같은 MID의 라이브 클라이언트 키와 시크릿 키를 설정합니다.</li><li>테스트 주문과 실제 주문을 구분한 뒤 라이브 모듈을 활성화합니다.</li></ol></div>
     </section>
   </main>

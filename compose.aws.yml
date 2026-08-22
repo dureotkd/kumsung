@@ -48,7 +48,9 @@ services:
       EMAIL_OUTBOX_POLL_MS: ${EMAIL_OUTBOX_POLL_MS:-1000}
       EMAIL_OUTBOX_BATCH_SIZE: ${EMAIL_OUTBOX_BATCH_SIZE:-10}
       GOOGLE_SHEETS_ENABLED: ${GOOGLE_SHEETS_ENABLED:-false}
-      TOSS_SECRET_KEY: ${TOSS_SECRET_KEY:-}
+      TOSS_CLIENT_KEY: ${TOSS_CLIENT_KEY:-}
+      TOSS_SECRET_KEY: ""
+      TOSS_SECRET_KEY_FILE: /run/secrets/toss_secret_key
       SHOP_ADMIN_ACCESS_PASSWORD: ${SHOP_ADMIN_ACCESS_PASSWORD:?SHOP_ADMIN_ACCESS_PASSWORD is required}
       PRIVACY_VERSION: ${PRIVACY_VERSION:-2026-07-28}
       INQUIRY_RETENTION_DAYS: ${INQUIRY_RETENTION_DAYS:-1095}
@@ -62,6 +64,7 @@ services:
       - db_password
       - mail_password
       - admin_password
+      - toss_secret_key
     depends_on:
       clamav:
         condition: service_healthy
@@ -101,3 +104,5 @@ secrets:
     file: ${MAIL_PASSWORD_SECRET_FILE:-./.secrets/mail_password}
   admin_password:
     file: ${ADMIN_PASSWORD_SECRET_FILE:-./.secrets/admin_password}
+  toss_secret_key:
+    file: ${TOSS_SECRET_KEY_SECRET_FILE:-./.secrets/toss_secret_key}
