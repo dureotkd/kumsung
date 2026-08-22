@@ -18,7 +18,7 @@ const shopPaymentFooter=document.querySelector("#shopPaymentFooter");
 const catalogSections=[
   {key:"standard",title:"표준 규격 제품",description:"별도 도면 없이 바로 주문 가능한 규격 제품이에요.",codes:["DRY_PD","FIRE_HYDRANT_BOX","WATERPROOF_EQUIPMENT_BOX","SEISMIC_FRAME"]},
   {key:"site",title:"현장별 개별 결제",description:"견적 확정 후 담당자가 등록한 현장별 금액을 바로 결제할 수 있어요.",codes:["SITE_GANGNAM","SITE_SEOCHO","SITE_BANPO"]},
-  {key:"other",title:"기타",description:"부속·소모품 등 개별 항목이에요. 필요한 항목을 선택해 문의하세요.",codes:["ACCESSORY_HANDLE","ACCESSORY_PIN","ACCESSORY_PUSH_BUTTON","OTHER_1","OTHER_2"]}
+  {key:"other",title:"기타",description:"부속·소모품 단가를 확인하고 바로 결제하거나, 필요한 규격을 문의하세요.",codes:["ACCESSORY_HANDLE","ACCESSORY_PIN","ACCESSORY_PUSH_BUTTON","OTHER_1","OTHER_2"]}
 ];
 const standardIcons={DRY_PD:"▥",FIRE_HYDRANT_BOX:"▣",WATERPROOF_EQUIPMENT_BOX:"⌑",SEISMIC_FRAME:"△"};
 let products=[];
@@ -45,10 +45,18 @@ function renderSiteItem(product){
   </article>`;
 }
 
-function renderInquiryItem(product,requested){
+function renderOtherItem(product,requested){
   const checked=requested===product.code;
   return `<article class="shop-catalog-item shop-inquiry-item">
-    <div class="shop-inquiry-summary"><div class="shop-item-copy"><strong>${esc(product.name)}</strong></div><button class="shop-inquiry-button" type="button" data-inquire="${product.id}" aria-pressed="${checked}">${checked?"선택됨":"문의하기"}</button><input type="checkbox" data-id="${product.id}" aria-label="${esc(product.name)} 선택" ${checked?"checked":""}></div>
+    <div class="shop-inquiry-summary">
+      <div class="shop-item-copy"><strong>${esc(product.name)}</strong></div>
+      <div class="shop-item-action shop-other-actions">
+        <strong class="shop-unit-price">${won(product.price)}<small>/ EA</small></strong>
+        <button class="shop-pay-button" type="button" data-buy="${product.id}" ${paymentConfig.ready?"":"disabled"}>${paymentConfig.ready?"결제하기":"준비 중"}</button>
+        <button class="shop-inquiry-button" type="button" data-inquire="${product.id}" aria-pressed="${checked}">${checked?"선택됨":"문의하기"}</button>
+      </div>
+      <input type="checkbox" data-id="${product.id}" aria-label="${esc(product.name)} 선택" ${checked?"checked":""}>
+    </div>
     <div class="sync-product-options" ${checked?"":"hidden"}>
       <label>도면·이미지 업로드 <small>선택, PDF·JPG·PNG·DWG·DXF</small><input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf" data-files></label>
       <label>수량<input type="number" min="1" max="999" value="1" data-quantity></label>
@@ -63,7 +71,7 @@ function renderProducts(){
   shopQuickNav.innerHTML=catalogSections.map((section,index)=>`<a href="#shop-category-${index+1}">${esc(section.title)}</a>`).join("");
   productHost.innerHTML=catalogSections.map((section,sectionIndex)=>{
     const items=section.codes.map(code=>byCode.get(code)).filter(Boolean);
-    const rows=items.map((product,index)=>section.key==="standard"?renderStandardItem(product,index):section.key==="site"?renderSiteItem(product):renderInquiryItem(product,requested)).join("");
+    const rows=items.map((product,index)=>section.key==="standard"?renderStandardItem(product,index):section.key==="site"?renderSiteItem(product):renderOtherItem(product,requested)).join("");
     return `<section id="shop-category-${sectionIndex+1}" class="shop-catalog-section shop-section-${section.key}">
       <div class="sync-section-title"><span class="sync-cat-num">${String(sectionIndex+1).padStart(2,"0")}</span><h2>${esc(section.title)}</h2></div>
       <p class="sync-section-desc">${esc(section.description)}</p>

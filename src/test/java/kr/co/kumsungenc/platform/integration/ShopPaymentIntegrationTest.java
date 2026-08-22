@@ -52,7 +52,13 @@ class ShopPaymentIntegrationTest {
             .andExpect(jsonPath("$[3].price",is(145000)))
             .andExpect(jsonPath("$[4].code",is("SITE_GANGNAM")))
             .andExpect(jsonPath("$[4].price",is(1000000)))
-            .andExpect(jsonPath("$[11].code",is("OTHER_2")));
+            .andExpect(jsonPath("$[7].code",is("ACCESSORY_HANDLE")))
+            .andExpect(jsonPath("$[7].price",is(1000)))
+            .andExpect(jsonPath("$[8].price",is(500)))
+            .andExpect(jsonPath("$[9].price",is(2500)))
+            .andExpect(jsonPath("$[10].price",is(10000)))
+            .andExpect(jsonPath("$[11].code",is("OTHER_2")))
+            .andExpect(jsonPath("$[11].price",is(10000)));
     }
 
     @Test

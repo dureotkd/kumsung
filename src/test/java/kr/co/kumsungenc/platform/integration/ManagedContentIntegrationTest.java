@@ -99,6 +99,10 @@ class ManagedContentIntegrationTest {
             .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.id == "+postId+")].title").value(hasItem("새 회사소식")));
         mvc.perform(get("/api/public/content/posts/{id}/image",postId))
             .andExpect(status().isOk()).andExpect(content().contentType("image/png"));
+        mvc.perform(get("/support.html"))
+            .andExpect(status().isOk()).andExpect(content().string(containsString("companyNewsList")));
+        mvc.perform(get("/index.html"))
+            .andExpect(status().isOk()).andExpect(content().string(containsString("homeCompanyNews")));
     }
 
     private MockMultipartFile png(String part,String name){

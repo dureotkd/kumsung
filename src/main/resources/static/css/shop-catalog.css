@@ -26,6 +26,9 @@
 .shop-inquiry-summary{min-height:58px;padding:10px 14px}
 .shop-inquiry-button{min-width:58px;padding:8px 10px;border:0;border-radius:8px;background:var(--sync-tint);color:var(--sync-deep);font:800 10px 'Noto Sans KR',sans-serif;cursor:pointer}
 .shop-inquiry-button[aria-pressed="true"]{background:var(--sync-deep);color:#fff}
+.shop-other-actions{gap:8px}
+.shop-other-actions .shop-pay-button{min-width:58px;padding:0 10px;font:800 10px 'Noto Sans KR',sans-serif}
+.shop-other-actions .shop-inquiry-button{display:block;min-width:58px;height:30px;padding:0 10px;font:800 10px 'Noto Sans KR',sans-serif}
 .shop-inquiry-summary>input{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
 .shop-inquiry-item .sync-product-options{border-top:1px solid var(--sync-line)}
 .shop-price-note{margin:18px 0 0 35px;color:var(--sync-muted);font-size:10px}
@@ -42,6 +45,11 @@
   .shop-unit-price small{display:block;margin:2px 0 0;text-align:right}
   .shop-item-action{gap:7px}
   .shop-site-item .shop-item-action{gap:8px}
+  .shop-inquiry-summary{align-items:flex-start;flex-wrap:wrap}
+  .shop-inquiry-summary .shop-item-copy{padding-top:7px}
+  .shop-other-actions{flex:1 1 auto;gap:6px}
+  .shop-other-actions .shop-unit-price{margin-right:auto}
+  .shop-other-actions .shop-pay-button,.shop-other-actions .shop-inquiry-button{min-width:52px;padding-right:7px;padding-left:7px}
   .shop-site-item .shop-item-copy>strong{font-size:13px}
   .shop-item-action>.shop-pay-button{min-width:54px;padding:0 8px}
   .shop-price-note{margin-left:0}
