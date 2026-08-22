@@ -100,7 +100,13 @@ class ManagedContentIntegrationTest {
         mvc.perform(get("/api/public/content/posts/{id}/image",postId))
             .andExpect(status().isOk()).andExpect(content().contentType("image/png"));
         mvc.perform(get("/support.html"))
-            .andExpect(status().isOk()).andExpect(content().string(containsString("companyNewsList")));
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("companyNewsList")))
+            .andExpect(content().string(containsString("ys8r_YihCS4")))
+            .andExpect(content().string(containsString("jntZV9d1wOI")))
+            .andExpect(content().string(containsString("kumsung7879_")))
+            .andExpect(content().string(containsString("liguolong_offic")))
+            .andExpect(content().string(containsString("maei6519")));
         mvc.perform(get("/index.html"))
             .andExpect(status().isOk()).andExpect(content().string(containsString("homeCompanyNews")));
     }
