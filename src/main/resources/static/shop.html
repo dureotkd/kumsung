@@ -6,7 +6,7 @@
   <title>SMART SHOP | (주)금성이엔씨</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/synced-public.css"><link rel="stylesheet" href="/css/memo-form.css">
+  <link rel="stylesheet" href="/css/synced-public.css"><link rel="stylesheet" href="/css/memo-form.css"><link rel="stylesheet" href="/css/shop-catalog.css">
 </head>
 <body class="sync-public">
 <div class="sync-shell">
@@ -15,10 +15,10 @@
     <nav class="sync-nav" aria-label="주요 메뉴"><a href="/quote.html">온라인 견적접수</a><a class="active" aria-current="page" href="/shop.html">SMART SHOP</a><a href="/projects.html">기술혁신센터</a><a href="/support.html">홍보센터</a></nav>
   </header>
   <main>
-    <section class="sync-hero"><p id="shopPaymentEyebrow" class="eyebrow">SMART SHOP · TOSS PAYMENTS</p><h1>제품을 확인하고<br>바로 구매하세요</h1><p id="shopPaymentIntro">가격이 등록된 제품은 토스페이먼츠로 바로 구매할 수 있습니다. 주문제작 제품은 기존처럼 규격·수량·도면을 남겨 문의해 주세요.</p></section>
+    <section class="sync-hero shop-catalog-hero"><p id="shopPaymentEyebrow" class="eyebrow">SMART SHOP</p><h1>제품을 카테고리에서<br>바로 찾아보세요</h1><p id="shopPaymentIntro">표준 규격 제품을 확인하고 바로 결제하세요.</p></section>
     <nav id="shopQuickNav" class="sync-quicknav" aria-label="제품 카테고리"></nav>
-    <section class="sync-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">PRODUCT</span><h2>제품 구매·문의</h2></div><span id="shopPaymentBadge" class="sync-payment-badge">결제 확인 중</span></div><p class="sync-section-desc">가격이 표시된 제품은 구매하기 버튼으로 결제하고, 가격 문의 제품은 선택해서 제작 문의를 남겨 주세요.</p><div id="shopProducts" class="sync-category-grid" aria-live="polite"></div></section>
-    <div id="shopSelectionBar" class="sync-sticky"><div><small>선택한 문의 제품</small><strong><span id="shopSelectionCount">0</span>건</strong></div><a href="#shopInquiry">문의 정보 작성 →</a></div>
+    <section class="sync-section shop-catalog-shell"><div class="shop-payment-state"><span id="shopPaymentBadge" class="sync-payment-badge">결제 확인 중</span></div><div id="shopProducts" class="shop-catalog" aria-live="polite"></div><p class="shop-price-note">가격은 규격·재질에 따라 달라질 수 있어요.</p></section>
+    <div id="shopSelectionBar" class="sync-sticky shop-selection-bar" hidden><div><small>선택한 문의 제품</small><strong><span id="shopSelectionCount">0</span>건</strong></div><a href="#shopInquiry">문의 정보 작성 →</a></div>
     <section id="shopInquiry" class="sync-section sync-inquiry-section"><div class="sync-section-head"><div class="sync-section-title"><span class="sync-tag">INQUIRY</span><h2>제작 문의 접수</h2></div></div><p class="sync-section-desc">결제 없이 접수되며 담당자가 확인한 뒤 견적과 납기를 안내합니다.</p>
       <form id="shopInquiryForm" class="sync-inquiry">
         <label class="form-trap" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>

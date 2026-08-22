@@ -41,6 +41,21 @@ class ShopPaymentIntegrationTest {
     @MockitoBean TossPaymentsClient toss;
 
     @Test
+    void exposesApprovedFixedCatalogWithUnitPrices() throws Exception {
+        mvc.perform(get("/api/public/shop/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()",is(12)))
+            .andExpect(jsonPath("$[0].code",is("DRY_PD")))
+            .andExpect(jsonPath("$[0].name",is("건식PD 표준형")))
+            .andExpect(jsonPath("$[0].price",is(128000)))
+            .andExpect(jsonPath("$[3].code",is("SEISMIC_FRAME")))
+            .andExpect(jsonPath("$[3].price",is(145000)))
+            .andExpect(jsonPath("$[4].code",is("SITE_GANGNAM")))
+            .andExpect(jsonPath("$[4].price",is(1000000)))
+            .andExpect(jsonPath("$[11].code",is("OTHER_2")));
+    }
+
+    @Test
     void createsOrderFromManagedProductPriceAndConfirmsMatchingPayment() throws Exception {
         jdbc.update("""
             update shop_payment_settings set enabled=true,mode='TEST',
@@ -130,6 +145,20 @@ class ShopPaymentIntegrationTest {
                     "deliveryAddress","서울시 테스트구 1","privacyAgreed",true))))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message",is("현재 바로 구매할 수 없는 제품입니다.")));
+    }
+
+    @Test
+    void sitePaymentUsesOneApprovedAmountOnly() throws Exception {
+        jdbc.update("update shop_payment_settings set enabled=true,mode='TEST',client_key='test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq' where id=1");
+        long productId=jdbc.queryForObject("select id from shop_products where code='SITE_GANGNAM'",Long.class);
+        mvc.perform(post("/api/public/shop/orders").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(Map.of(
+                    "productId",productId,"quantity",2,"buyerName","테스트 구매자",
+                    "buyerEmail","buyer@example.com","buyerPhone","01012345678",
+                    "deliveryAddress","서울시 테스트구 1","privacyAgreed",true))))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message",is("현장별 결제는 확정 금액 1건으로만 결제할 수 있습니다.")));
     }
 
     private long createProduct(Long price){

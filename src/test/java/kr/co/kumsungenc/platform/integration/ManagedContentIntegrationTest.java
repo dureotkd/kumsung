@@ -44,10 +44,12 @@ class ManagedContentIntegrationTest {
     }
 
     @Test
-    void seededShopContainsTwentyFiveAdminManagedProducts() throws Exception {
+    void publicShopUsesFixedCatalogWhileAdminKeepsManagedProducts() throws Exception {
         mvc.perform(get("/api/public/shop/products"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(greaterThanOrEqualTo(25)))
+            .andExpect(jsonPath("$.length()").value(12))
+            .andExpect(jsonPath("$[0].code").value("DRY_PD"))
+            .andExpect(jsonPath("$[4].code").value("SITE_GANGNAM"))
             .andExpect(jsonPath("$[0].imageUrl").isNotEmpty());
         mvc.perform(get("/api/shop-admin/products").param("limit","30")
                 .sessionAttr(ShopAdminAccessService.VERIFIED_AT,System.currentTimeMillis())
