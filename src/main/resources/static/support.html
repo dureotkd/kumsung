@@ -7,27 +7,29 @@
   <title>홍보센터 | (주)금성이엔씨</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/synced-public.css">
   <link rel="stylesheet" href="/css/memo-form.css">
   <link rel="stylesheet" href="/css/support-pr.css">
+  <link rel="stylesheet" href="/css/main-menu.css">
+  <link rel="stylesheet" href="/css/company-brand.css">
+  <link rel="stylesheet" href="/css/section-page.css">
 </head>
-<body class="sync-public">
-<div class="sync-shell">
-  <header class="sync-header">
-    <div class="sync-brand-row">
-      <a class="sync-brand" href="/"><img src="/images/kumsung-enc-symbol.png" alt=""><img src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
-      <a class="sync-login" href="/login.html" data-auth-link>고객 로그인</a>
-    </div>
-    <nav class="sync-nav" aria-label="주요 메뉴"><a href="/quote.html">온라인 견적접수</a><a href="/shop.html">SMART SHOP</a><a href="/projects.html">기술혁신센터</a><a class="active" aria-current="page" href="/support.html">홍보센터</a></nav>
+<body class="section-page sync-public">
+  <header class="nav">
+    <a class="official-brand" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark official-brand-wordmark-korean" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
+    <nav class="main-menu" aria-label="주요 메뉴"><a href="/quote.html"><b>온라인 견적접수</b></a><a href="/shop.html"><b>SMART SHOP</b></a><a href="/projects.html"><b>기술혁신센터</b></a><a class="active" aria-current="page" href="/support.html"><b>홍보센터</b></a></nav>
+    <a class="nav-cta" href="/login.html" data-auth-link>고객 로그인</a>
   </header>
 
-  <main>
-    <section class="sync-hero sync-pr-hero">
-      <p class="eyebrow">PR CENTER</p>
-      <h1>채널로 만나는<br>금성이엔씨 소식</h1>
-      <p>제품·견적 문의는 온라인 견적접수 또는 SMART SHOP에서 진행해 주세요.</p>
-    </section>
+  <main class="section-page-main">
+    <section class="section-page-hero"><div>
+      <p class="section-kicker light">PR CENTER</p>
+      <h1>홍보센터</h1>
+      <p>금성이엔씨의 채널과 회사소식, 시공사례를 확인하세요.</p>
+    </div></section>
+    <div class="section-page-content wrap">
     <nav class="sync-quicknav" aria-label="홍보센터 바로가기"><a href="#social-channels">SNS·채널</a><a href="#shared-programs">신개발 프로그램</a><a href="#company-news">회사소식</a><a href="#construction-cases">시공사례</a><a href="#support-inquiry">그 외 문의</a></nav>
 
     <section id="social-channels" class="sync-section sync-pr-section">
@@ -96,10 +98,10 @@
         </form>
       </div>
     </section>
+    </div>
   </main>
 
-  <footer class="sync-footer">© 2026 KUMSUNG ENC CO., LTD. · 제품·견적 관련 문의는 온라인 견적접수를 이용하시면 더 빠르게 처리돼요.</footer>
-</div>
+  <footer><a class="official-brand on-dark" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark" src="/images/kumsung-enc-ai-wordmark.png" alt="(주)금성이엔씨 KUMSUNG ENC"></a><p>산업의 내일을 만드는 기술 파트너</p><small>© 2026 KUMSUNG ENC CO., LTD. ALL RIGHTS RESERVED.</small></footer>
 
 <dialog id="contentDetailDialog" class="sync-detail-dialog"><button class="sync-dialog-close" type="button" aria-label="닫기">×</button><img id="contentDetailImage" class="sync-dialog-image" alt=""><div class="sync-dialog-body"><span id="contentDetailType" class="sync-tag"></span><h2 id="contentDetailTitle"></h2><p id="contentDetailText"></p><small id="contentDetailDate"></small></div></dialog>
 <script src="/js/support-content.js"></script>

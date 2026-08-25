@@ -32,7 +32,7 @@
 1. 최고관리자가 통합 관리자 화면의 **관리자 관리**에서 권한을 `SHOP 관리자`로 선택해 담당자를 초대합니다.
 2. 담당자는 메일 링크에서 자신의 12자 이상 비밀번호를 설정합니다.
 3. SHOP 관리자 계정은 로그인 후 전용 2차 비밀번호 확인 화면으로 이동합니다.
-4. 로그인 비밀번호와 별개인 `SHOP_ADMIN_ACCESS_PASSWORD`를 입력한 관리자만 `shop-admin.html`과 SHOP 관리 API를 사용할 수 있습니다. 확인 화면에는 아이디 입력란이 없으며, 주소를 직접 입력하면 매번 2차 비밀번호 확인 화면으로 이동합니다.
+4. 로그인 비밀번호와 별개인 SHOP 2차 비밀번호 `local-shop-admin-5678`을 입력한 관리자만 `shop-admin.html`과 SHOP 관리 API를 사용할 수 있습니다. 확인 화면에는 아이디 입력란이 없으며, 주소를 직접 입력하면 매번 2차 비밀번호 확인 화면으로 이동합니다.
 5. 토스페이먼츠 메뉴에서 테스트·라이브 모드와 클라이언트 키를 저장합니다. 서버 설정으로 관리하려면 `.env.local`의 `TOSS_CLIENT_KEY`를 사용합니다.
 6. 시크릿 키는 화면이나 DB에 입력하지 않고 `.env.local`의 `TOSS_SECRET_KEY`에 설정한 뒤 애플리케이션을 재시작합니다.
 
@@ -82,9 +82,9 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 - 이메일: `admin@localhost.test`
 - 비밀번호: `local-admin-1234`
-- SHOP 2차 비밀번호: `local-shop-admin-5678` (`.env.local`의 `SHOP_ADMIN_ACCESS_PASSWORD`로 변경)
+- SHOP 2차 비밀번호: `local-shop-admin-5678` (코드에 고정)
 
-이 계정과 비밀번호는 로컬 개발 전용입니다. 운영 환경에서는 사용하지 마세요.
+위 관리자 이메일과 로그인 비밀번호는 로컬 개발 전용입니다. SHOP 2차 비밀번호는 실행 환경과 관계없이 코드에 고정되어 있습니다.
 
 ## 종료와 재실행
 
@@ -120,7 +120,6 @@ notepad .env.local
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD`: 최초 로컬 관리자 계정
 - `TOSS_CLIENT_KEY`: 토스페이먼츠 브라우저 SDK용 테스트 또는 라이브 클라이언트 키
 - `TOSS_SECRET_KEY`: 위 클라이언트 키와 같은 세트인 서버 전용 시크릿 키
-- `SHOP_ADMIN_ACCESS_PASSWORD`: SHOP 관리자 진입 전용 2차 비밀번호
 
 포트를 바꾸기 전에는 `local-down.ps1`로 서비스를 종료하세요. `SERVER_PORT`를 변경하면 `APP_BASE_URL`도 같은 포트로 맞춰야 합니다.
 

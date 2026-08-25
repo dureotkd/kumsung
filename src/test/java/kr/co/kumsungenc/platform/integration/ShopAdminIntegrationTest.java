@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties={
     "app.email-outbox.enabled=false","app.google-sheets.enabled=false",
     "app.admin-email=","app.admin-password=",
-    "app.shop-admin.access-password=IndependentShopPassword5678!",
     "app.toss-payments.secret-key=test_sk_shop_admin_server_key"
 })
 @AutoConfigureMockMvc
@@ -63,7 +62,7 @@ class ShopAdminIntegrationTest {
             .andExpect(status().isForbidden());
         mvc.perform(post("/api/shop-admin/access").session(session).with(shopAdmin(email)).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsBytes(Map.of("password","IndependentShopPassword5678!"))))
+                .content(mapper.writeValueAsBytes(Map.of("password","local-shop-admin-5678"))))
             .andExpect(status().isOk());
         mvc.perform(get("/shop-admin.html").session(session).with(shopAdmin(email)))
             .andExpect(status().isOk());

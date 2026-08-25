@@ -5,17 +5,18 @@
   <meta name="description" content="(주)금성이엔씨 SMART SHOP 제품 문의 접수">
   <title>SMART SHOP | (주)금성이엔씨</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/synced-public.css"><link rel="stylesheet" href="/css/memo-form.css"><link rel="stylesheet" href="/css/shop-catalog.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/memo-form.css"><link rel="stylesheet" href="/css/synced-public.css"><link rel="stylesheet" href="/css/shop-catalog.css"><link rel="stylesheet" href="/css/main-menu.css"><link rel="stylesheet" href="/css/company-brand.css"><link rel="stylesheet" href="/css/section-page.css">
 </head>
-<body class="sync-public">
-<div class="sync-shell">
-  <header class="sync-header">
-    <div class="sync-brand-row"><a class="sync-brand" href="/"><img src="/images/kumsung-enc-symbol.png" alt=""><img src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a><a class="sync-login" href="/login.html" data-auth-link>고객 로그인</a></div>
-    <nav class="sync-nav" aria-label="주요 메뉴"><a href="/quote.html">온라인 견적접수</a><a class="active" aria-current="page" href="/shop.html">SMART SHOP</a><a href="/projects.html">기술혁신센터</a><a href="/support.html">홍보센터</a></nav>
+<body class="section-page sync-public">
+  <header class="nav">
+    <a class="official-brand" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark official-brand-wordmark-korean" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
+    <nav class="main-menu" aria-label="주요 메뉴"><a href="/quote.html"><b>온라인 견적접수</b></a><a class="active" aria-current="page" href="/shop.html"><b>SMART SHOP</b></a><a href="/projects.html"><b>기술혁신센터</b></a><a href="/support.html"><b>홍보센터</b></a></nav>
+    <a class="nav-cta" href="/login.html" data-auth-link>고객 로그인</a>
   </header>
-  <main>
-    <section class="sync-hero shop-catalog-hero"><p id="shopPaymentEyebrow" class="eyebrow">SMART SHOP</p><h1>제품을 카테고리에서<br>바로 찾아보세요</h1><p id="shopPaymentIntro">표준 규격 제품을 확인하고 바로 결제하세요.</p></section>
+  <main class="section-page-main">
+    <section class="section-page-hero"><div><p id="shopPaymentEyebrow" class="section-kicker light">SMART SHOP</p><h1>SMART SHOP</h1><p id="shopPaymentIntro">표준 규격 제품을 확인하고 바로 결제하세요.</p></div></section>
+    <div class="section-page-content wrap">
     <nav id="shopQuickNav" class="sync-quicknav" aria-label="제품 카테고리"></nav>
     <section class="sync-section shop-catalog-shell"><div class="shop-payment-state"><span id="shopPaymentBadge" class="sync-payment-badge">결제 확인 중</span></div><div id="shopProducts" class="shop-catalog" aria-live="polite"></div><p class="shop-price-note">가격은 규격·재질에 따라 달라질 수 있어요.</p></section>
     <div id="shopSelectionBar" class="sync-sticky shop-selection-bar" hidden><div><small>선택한 문의 제품</small><strong><span id="shopSelectionCount">0</span>건</strong></div><a href="#shopInquiry">문의 정보 작성 →</a></div>
@@ -31,9 +32,9 @@
         <button class="sync-submit submit-shop" type="submit">SMART SHOP 문의 접수 →</button><p id="shopMessage" class="sync-message" role="status"></p>
       </form>
     </section>
+    </div>
   </main>
-  <footer id="shopPaymentFooter" class="sync-footer">© 2026 KUMSUNG ENC CO., LTD. · 안전한 결제는 토스페이먼츠에서 처리됩니다.</footer>
-</div>
+  <footer><a class="official-brand on-dark" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark" src="/images/kumsung-enc-ai-wordmark.png" alt="(주)금성이엔씨 KUMSUNG ENC"></a><p>산업의 내일을 만드는 기술 파트너</p><small id="shopPaymentFooter">© 2026 KUMSUNG ENC CO., LTD. · 안전한 결제는 토스페이먼츠에서 처리됩니다.</small></footer>
 <dialog id="shopSuccess" class="sync-success-dialog"><button type="button" aria-label="닫기">×</button><div>✓</div><h2>제품 문의가 접수되었습니다.</h2><p>접수번호 <strong id="shopReceipt"></strong></p><small>접수 확인 메일을 발송하며 담당자가 검토 후 연락드립니다.</small></dialog>
 <dialog id="shopCheckout" class="sync-checkout-dialog">
   <button class="sync-dialog-close" type="button" data-checkout-close aria-label="닫기">×</button>

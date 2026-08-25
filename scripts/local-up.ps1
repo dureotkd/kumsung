@@ -206,7 +206,6 @@ $managedEnvironment = @{
     "GOOGLE_SHEETS_ENABLED" = "false"
     "TOSS_CLIENT_KEY" = (Get-LocalSetting "TOSS_CLIENT_KEY" "")
     "TOSS_SECRET_KEY" = (Get-LocalSetting "TOSS_SECRET_KEY" "")
-    "SHOP_ADMIN_ACCESS_PASSWORD" = (Get-LocalSetting "SHOP_ADMIN_ACCESS_PASSWORD" "local-shop-admin-5678")
 }
 
 $previousEnvironment = @{}
