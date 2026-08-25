@@ -2,6 +2,12 @@ services:
   clamav:
     image: clamav/clamav:stable
     restart: unless-stopped
+    environment:
+      CLAMD_CONF_StreamMaxLength: 2048M
+      CLAMD_CONF_MaxFileSize: 2048M
+      CLAMD_CONF_MaxScanSize: 2048M
+      CLAMD_CONF_ReadTimeout: 1800
+      CLAMD_CONF_MaxThreads: 2
     volumes:
       - clamav_data:/var/lib/clamav
     healthcheck:
@@ -56,6 +62,7 @@ services:
       INQUIRY_RETENTION_DAYS: ${INQUIRY_RETENTION_DAYS:-1095}
       SHEET_OUTBOX_RETENTION_DAYS: ${SHEET_OUTBOX_RETENTION_DAYS:-1095}
       CLAMAV_HOST: clamav
+      CLAMAV_TIMEOUT_MS: ${CLAMAV_TIMEOUT_MS:-1800000}
       MALWARE_SCAN_ENABLED: "true"
       MALWARE_SCAN_REQUIRED: "true"
     volumes:

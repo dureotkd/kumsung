@@ -108,7 +108,7 @@ public class PortalController {
                 if(file.isEmpty())continue;
                 String original=Objects.requireNonNullElse(file.getOriginalFilename(),"file");
                 String ext=fileValidation.validateQuoteFile(file);
-                String stored=UUID.randomUUID()+"."+ext;String key=StorageKeys.quoteAttachment(receipt,stored);
+                String stored=UUID.randomUUID()+(ext.isBlank()?"":"."+ext);String key=StorageKeys.quoteAttachment(receipt,stored);
                 fileStorage.store(file,key);
                 staged.add(new Stored(original,stored,Objects.requireNonNullElse(file.getContentType(),"application/octet-stream"),file.getSize(),key));
             }

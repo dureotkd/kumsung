@@ -154,7 +154,7 @@ class ShopPaymentIntegrationTest {
     }
 
     @Test
-    void sitePaymentUsesOneApprovedAmountOnly() throws Exception {
+    void sitePaymentAcceptsRequestedQuantity() throws Exception {
         jdbc.update("update shop_payment_settings set enabled=true,mode='TEST',client_key='test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq' where id=1");
         long productId=jdbc.queryForObject("select id from shop_products where code='SITE_GANGNAM'",Long.class);
         mvc.perform(post("/api/public/shop/orders").with(csrf())
@@ -163,8 +163,26 @@ class ShopPaymentIntegrationTest {
                     "productId",productId,"quantity",2,"buyerName","테스트 구매자",
                     "buyerEmail","buyer@example.com","buyerPhone","01012345678",
                     "deliveryAddress","서울시 테스트구 1","privacyAgreed",true))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.amount",is(2000000)));
+    }
+
+    @Test
+    void acceptsOneThousandItemsAndRejectsLargerQuantity() throws Exception {
+        jdbc.update("update shop_payment_settings set enabled=true,mode='TEST',client_key='test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq' where id=1");
+        long productId=createProduct(1000L);
+        Map<String,Object> request=new java.util.LinkedHashMap<>(Map.of(
+            "productId",productId,"quantity",1000,"buyerName","테스트 구매자",
+            "buyerEmail","buyer@example.com","buyerPhone","01012345678",
+            "deliveryAddress","서울시 테스트구 1","privacyAgreed",true));
+        mvc.perform(post("/api/public/shop/orders").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.amount",is(1000000)));
+        request.put("quantity",1001);
+        mvc.perform(post("/api/public/shop/orders").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsBytes(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message",is("현장별 결제는 확정 금액 1건으로만 결제할 수 있습니다.")));
+            .andExpect(jsonPath("$.message",is("제품과 구매 수량을 확인해 주세요.")));
     }
 
     private long createProduct(Long price){

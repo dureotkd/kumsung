@@ -73,6 +73,25 @@ class ManagedContentIntegrationTest {
     }
 
     @Test
+    void requestedShopAndQuoteControlsAreExposedInStaticPages() throws Exception {
+        String shopPage=mvc.perform(get("/shop.html")).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String shopScript=mvc.perform(get("/js/shop.js")).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String homePage=mvc.perform(get("/index.html")).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String quotePage=mvc.perform(get("/quote.html")).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(shopPage).contains("name=\"quantity\" type=\"number\" min=\"1\" max=\"1000\"");
+        assertThat(shopScript).contains("checkoutForm.quantity.max=\"1000\"")
+            .doesNotContain("readOnly=fixedSitePayment");
+        assertThat(homePage).contains("<h3>기술혁신센터</h3><ul><li>연구전담부서</li><li>특허·인증</li><li>기술자료</li>");
+        assertThat(quotePage).contains("모든 파일 형식 · 파일당 최대 2GB · 전체 최대 4GB")
+            .doesNotContain("id=\"files\" type=\"file\" multiple accept=");
+    }
+
+    @Test
     void administratorUploadsProtectedInnovationResourceAndCustomerDownloadsWithPassword() throws Exception {
         MockMultipartFile image=png("image","technology.png");
         MockMultipartFile file=new MockMultipartFile("file","technology.pdf","application/pdf",

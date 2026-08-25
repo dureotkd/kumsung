@@ -108,7 +108,7 @@ public class ShopInquiryService {
         if(r.items()==null||r.items().isEmpty()||r.items().size()>4)throw new IllegalArgumentException("문의할 제품을 1개 이상 선택해 주세요.");
         Set<Long> productIds=new HashSet<>();Set<Integer> claimed=new HashSet<>();
         for(Item item:r.items()){
-            if(item==null||item.productId()==null||!productIds.add(item.productId())||item.quantity()==null||item.quantity()<1||item.quantity()>999)throw new IllegalArgumentException("제품과 수량을 확인해 주세요.");
+            if(item==null||item.productId()==null||!productIds.add(item.productId())||item.quantity()==null||item.quantity()<1||item.quantity()>1000)throw new IllegalArgumentException("제품과 수량을 확인해 주세요.");
             if(item.specifications()!=null&&item.specifications().length()>1000)throw new IllegalArgumentException("제품별 요청사항은 1000자 이하로 입력해 주세요.");
             for(Integer index:indexes(item))if(index==null||index<0||index>=fileCount||!claimed.add(index))throw new IllegalArgumentException("제품 첨부파일 연결 정보가 올바르지 않습니다.");
         }

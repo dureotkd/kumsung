@@ -48,7 +48,7 @@ public class ShopPaymentService {
     public Map<String,Object> create(CreateOrder request,Principal principal,String ip,String userAgent){
         requirePaymentReady();
         if(request==null||request.productId()==null||request.quantity()==null
-                ||request.quantity()<1||request.quantity()>99)
+                ||request.quantity()<1||request.quantity()>1000)
             throw new IllegalArgumentException("제품과 구매 수량을 확인해 주세요.");
         text(request.buyerName(),100,"구매자명");
         text(request.buyerEmail(),100,"이메일");
@@ -67,8 +67,6 @@ public class ShopPaymentService {
             """,request.productId());
         if(products.isEmpty())throw new IllegalArgumentException("현재 바로 구매할 수 없는 제품입니다.");
         Map<String,Object> product=products.getFirst();
-        if(String.valueOf(product.get("code")).startsWith("SITE_")&&request.quantity()!=1)
-            throw new IllegalArgumentException("현장별 결제는 확정 금액 1건으로만 결제할 수 있습니다.");
         long unitPrice=((Number)product.get("price")).longValue();
         long amount;
         try{amount=Math.multiplyExact(unitPrice,request.quantity().longValue());}

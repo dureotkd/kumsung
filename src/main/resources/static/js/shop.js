@@ -59,7 +59,7 @@ function renderOtherItem(product,requested){
     </div>
     <div class="sync-product-options" ${checked?"":"hidden"}>
       <label>도면·이미지 업로드 <small>선택, PDF·JPG·PNG·DWG·DXF</small><input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf" data-files></label>
-      <label>수량<input type="number" min="1" max="999" value="1" data-quantity></label>
+      <label>수량<input type="number" min="1" max="1000" value="1" data-quantity></label>
       <label class="sync-product-request">제품별 요청<textarea maxlength="1000" rows="3" data-specifications placeholder="규격·치수·재질·희망 납기 등을 적어 주세요."></textarea></label>
     </div>
   </article>`;
@@ -113,14 +113,13 @@ productHost.addEventListener("click",event=>{
   if(!buyButton)return;
   const product=products.find(item=>Number(item.id)===Number(buyButton.dataset.buy));
   if(!product||!paymentConfig.ready)return;
-  const fixedSitePayment=product.code.startsWith("SITE_");
   checkoutForm.reset();
   checkoutForm.productId.value=product.id;
   checkoutForm.quantity.value=1;
-  checkoutForm.quantity.readOnly=fixedSitePayment;
-  checkoutForm.quantity.max=fixedSitePayment?"1":"99";
-  checkoutForm.classList.toggle("site-payment",fixedSitePayment);
-  checkoutForm.querySelector(".sync-checkout-grid label").childNodes[0].textContent=fixedSitePayment?"결제 건수":"수량";
+  checkoutForm.quantity.readOnly=false;
+  checkoutForm.quantity.max="1000";
+  checkoutForm.classList.remove("site-payment");
+  checkoutForm.querySelector(".sync-checkout-grid label").childNodes[0].textContent="수량";
   checkoutProductName.textContent=product.name;
   checkoutDialog.dataset.unitPrice=product.price;
   checkoutDialog.dataset.productCode=product.code;

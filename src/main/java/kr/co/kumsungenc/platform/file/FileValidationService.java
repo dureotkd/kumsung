@@ -10,13 +10,24 @@ import java.util.*;
 @Service
 public class FileValidationService {
     private static final int MAX_FILES_PER_REQUEST=20;
-    private static final long MAX_TOTAL_SIZE=200L*1024*1024;
-    private static final Set<String> QUOTE_EXTENSIONS=Set.of("pdf","jpg","jpeg","png","dwg","dxf","xls","xlsx","zip");
+    private static final long MAX_QUOTE_FILE_SIZE=2L*1024*1024*1024;
+    private static final long MAX_TOTAL_SIZE=4L*1024*1024*1024;
+    private static final Set<String> SIGNATURE_EXTENSIONS=Set.of("pdf","jpg","jpeg","png","webp","dwg","dxf","xls","xlsx","doc","docx","zip");
     private static final Set<String> DOCUMENT_EXTENSIONS=Set.of("pdf","xls","xlsx","doc","docx");
     private static final Set<String> IMAGE_EXTENSIONS=Set.of("jpg","jpeg","png","webp");
     private static final Set<String> RESOURCE_EXTENSIONS=Set.of("pdf","jpg","jpeg","png","webp","dwg","dxf","xls","xlsx","doc","docx","zip");
     public String validateQuoteFile(MultipartFile file) throws IOException {
-        return validate(file,QUOTE_EXTENSIONS,50L*1024*1024);
+        if(file==null||file.isEmpty())throw new IllegalArgumentException("빈 파일은 업로드할 수 없습니다.");
+        String name=cleanName(file);
+        if(file.getSize()>MAX_QUOTE_FILE_SIZE)throw new IllegalArgumentException("파일 용량 제한을 초과했습니다: "+name);
+        String ext=extension(name);
+        if(SIGNATURE_EXTENSIONS.contains(ext)){
+            byte[] header;
+            try(InputStream in=file.getInputStream()){header=in.readNBytes(256);}
+            if(!matchesSignature(ext,header))
+                throw new IllegalArgumentException("파일 내용과 확장자가 일치하지 않습니다: "+name);
+        }
+        return ext;
     }
     public String validateDocument(MultipartFile file) throws IOException {
         return validate(file,DOCUMENT_EXTENSIONS,50L*1024*1024);
@@ -35,15 +46,15 @@ public class FileValidationService {
         for(MultipartFile file:files){
             if(file==null||file.isEmpty())continue;
             if(file.getSize()>MAX_TOTAL_SIZE-total)
-                throw new IllegalArgumentException("첨부파일 전체 용량은 200MB까지 가능합니다.");
+                throw new IllegalArgumentException("첨부파일 전체 용량은 4GB까지 가능합니다.");
             total+=file.getSize();
         }
     }
     private String validate(MultipartFile file,Set<String> allowed,long maxSize) throws IOException {
         if(file==null||file.isEmpty())throw new IllegalArgumentException("빈 파일은 업로드할 수 없습니다.");
-        String name=StringUtils.cleanPath(Objects.requireNonNullElse(file.getOriginalFilename(),""));
+        String name=cleanName(file);
         String ext=extension(name);
-        if(name.isBlank()||name.contains("..")||!allowed.contains(ext))
+        if(!allowed.contains(ext))
             throw new IllegalArgumentException("허용되지 않는 파일입니다: "+name);
         if(file.getSize()>maxSize)throw new IllegalArgumentException("파일 용량 제한을 초과했습니다: "+name);
         byte[] header;
@@ -51,6 +62,12 @@ public class FileValidationService {
         if(!matchesSignature(ext,header))
             throw new IllegalArgumentException("파일 내용과 확장자가 일치하지 않습니다: "+name);
         return ext;
+    }
+    private String cleanName(MultipartFile file){
+        String name=StringUtils.cleanPath(Objects.requireNonNullElse(file.getOriginalFilename(),""));
+        if(name.isBlank()||name.contains("..")||name.contains("/")||name.contains("\\"))
+            throw new IllegalArgumentException("허용되지 않는 파일입니다: "+name);
+        return name;
     }
     private boolean matchesSignature(String ext,byte[] b){
         return switch(ext){

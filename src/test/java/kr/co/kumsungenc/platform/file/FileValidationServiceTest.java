@@ -27,6 +27,20 @@ class FileValidationServiceTest {
     }
 
     @Test
+    void acceptsAnyQuoteFileExtension() throws Exception {
+        var file=new MockMultipartFile("files","assembly.step","application/octet-stream",
+            "ISO-10303-21;".getBytes());
+        assertEquals("step",service.validateQuoteFile(file));
+    }
+
+    @Test
+    void acceptsQuoteFileWithoutExtension() throws Exception {
+        var file=new MockMultipartFile("files","README","application/octet-stream",
+            "project notes".getBytes());
+        assertEquals("",service.validateQuoteFile(file));
+    }
+
+    @Test
     void rejectsPathTraversalName() {
         var file=new MockMultipartFile("files","../drawing.pdf","application/pdf",
             "%PDF-1.4".getBytes());
@@ -40,10 +54,19 @@ class FileValidationServiceTest {
     }
 
     @Test
-    void rejectsAggregateSizeOverTwoHundredMegabytes() {
+    void rejectsAggregateSizeOverFourGigabytes() {
         MultipartFile file=mock(MultipartFile.class);
         when(file.isEmpty()).thenReturn(false);
-        when(file.getSize()).thenReturn(200L*1024*1024+1);
+        when(file.getSize()).thenReturn(4L*1024*1024*1024+1);
         assertThrows(IllegalArgumentException.class,()->service.validateBatch(java.util.List.of(file)));
+    }
+
+    @Test
+    void rejectsQuoteFileOverTwoGigabytes() {
+        MultipartFile file=mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("oversized.bin");
+        when(file.getSize()).thenReturn(2L*1024*1024*1024+1);
+        assertThrows(IllegalArgumentException.class,()->service.validateQuoteFile(file));
     }
 }

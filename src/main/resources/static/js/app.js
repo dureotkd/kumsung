@@ -117,16 +117,16 @@ function render() {
 
 function add(incoming) {
   for (const file of incoming) {
-    if (file.size > 50 * 1024 * 1024) {
-      message.textContent = `${file.name}: 파일당 50MB를 초과했습니다.`;
+    if (file.size > 2 * 1024 * 1024 * 1024) {
+      message.textContent = `${file.name}: 파일당 2GB를 초과했습니다.`;
       continue;
     }
     if (selected.length >= 20) {
       message.textContent = "한 번에 최대 20개 파일까지 첨부할 수 있습니다.";
       break;
     }
-    if (selected.reduce((sum, item) => sum + item.size, 0) + file.size > 200 * 1024 * 1024) {
-      message.textContent = "첨부 파일 전체 용량은 200MB까지 가능합니다.";
+    if (selected.reduce((sum, item) => sum + item.size, 0) + file.size > 4 * 1024 * 1024 * 1024) {
+      message.textContent = "첨부 파일 전체 용량은 4GB까지 가능합니다.";
       continue;
     }
     if (!selected.some((item) => item.name === file.name && item.size === file.size)) selected.push(file);

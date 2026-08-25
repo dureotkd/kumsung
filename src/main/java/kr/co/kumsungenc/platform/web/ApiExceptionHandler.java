@@ -35,7 +35,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     ResponseEntity<Map<String,String>> tooLarge(){
-        return response(HttpStatus.PAYLOAD_TOO_LARGE,"업로드 용량 제한을 초과했습니다. 파일당 50MB, 요청당 200MB까지 가능합니다.");
+        return response(HttpStatus.PAYLOAD_TOO_LARGE,"업로드 용량 제한을 초과했습니다. 견적 자료는 파일당 2GB, 요청당 4GB까지 가능합니다.");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

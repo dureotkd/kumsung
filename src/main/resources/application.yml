@@ -13,8 +13,8 @@ spring:
     enabled: true
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 210MB
+      max-file-size: 2GB
+      max-request-size: 5GB
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -49,8 +49,6 @@ app:
   support-email: ${SUPPORT_EMAIL:B2B@kumsungenc.co.kr}
   admin-email: ${ADMIN_EMAIL:}
   admin-password: ${ADMIN_PASSWORD:}
-  shop-admin:
-    access-password: ${SHOP_ADMIN_ACCESS_PASSWORD:}
   toss-payments:
     client-key: ${TOSS_CLIENT_KEY:}
     secret-key: ${TOSS_SECRET_KEY:}
@@ -69,7 +67,7 @@ app:
     required: ${MALWARE_SCAN_REQUIRED:false}
     host: ${CLAMAV_HOST:localhost}
     port: ${CLAMAV_PORT:3310}
-    timeout-ms: ${CLAMAV_TIMEOUT_MS:10000}
+    timeout-ms: ${CLAMAV_TIMEOUT_MS:1800000}
   privacy:
     version: ${PRIVACY_VERSION:2026-07-28}
     purpose: 견적 상담 및 고객 업무 서비스 제공

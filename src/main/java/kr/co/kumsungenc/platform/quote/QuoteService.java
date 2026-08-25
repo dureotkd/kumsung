@@ -62,7 +62,7 @@ public class QuoteService {
                 if (file.isEmpty()) continue;
                 String original = StringUtils.cleanPath(Objects.requireNonNullElse(file.getOriginalFilename(), "file"));
                 String ext = fileValidation.extension(original);
-                String stored = UUID.randomUUID() + "." + ext;
+                String stored = UUID.randomUUID() + (ext.isBlank()?"":"." + ext);
                 String key=StorageKeys.quoteAttachment(q.getReceiptNumber(),stored);
                 fileStorage.store(file,key);storedKeys.add(key);
                 q.addAttachment(new QuoteAttachment(original, stored,
