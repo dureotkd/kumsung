@@ -1,8 +1,7 @@
 .section-page { background: #f5f8fb; }
-.section-page.sync-public { margin: 0; padding: 0; background: #f5f8f6; }
 .section-page .nav { position: relative; }
 .section-page-main { min-height: calc(100vh - 82px); }
-.section-page-hero { display: flex; align-items: center; min-height: 320px; padding: 72px 25px 68px; color: #fff; background: linear-gradient(120deg, #06192b, #0d416b); }
+.section-page-hero { display: flex; align-items: center; min-height: 325px; padding: 72px 25px 68px; color: #fff; background: linear-gradient(120deg, #06192b, #0d416b); }
 .section-page-hero > div { width: 100%; max-width: 1180px; margin: auto; }
 .section-page-hero h1 { margin: 14px 0 18px; font-size: clamp(36px, 5vw, 56px); line-height: 1.25; letter-spacing: -3px; }
 .section-page-hero p:not(.section-kicker) { max-width: 680px; margin: 0; color: #b8c8d6; font-size: 14px; line-height: 1.9; }
