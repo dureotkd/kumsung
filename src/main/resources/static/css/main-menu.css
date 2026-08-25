@@ -184,7 +184,7 @@
   .nav .nav-cta { padding: 9px 11px; font-size: 10px; }
   .nav .main-menu {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.15fr) minmax(0, .8fr) minmax(0, .75fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     width: 100%;
     padding: 0 6px;
     overflow: hidden;
@@ -195,9 +195,10 @@
     justify-content: center;
     min-width: 0;
     gap: 3px;
-    padding: 0 3px;
+    padding: 0 2px;
     overflow: hidden;
-    font-size: clamp(9px, 2.55vw, 11px);
+    font-size: 11px;
+    letter-spacing: -.3px;
   }
   .nav .main-menu b { display: block; max-width: 100%; overflow: hidden; }
   .nav .main-menu span { font-size: 13px; }
