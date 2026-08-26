@@ -15,11 +15,11 @@
 .nav .brand-mark { color: #1268e8; border-color: #1268e8; }
 
 .nav .main-menu {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 148px);
   align-self: stretch;
   justify-self: center;
-  justify-content: center;
-  gap: 4px;
+  gap: 0;
   margin: 0;
 }
 
@@ -28,11 +28,11 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 148px;
-  min-width: 148px;
+  width: 100%;
+  min-width: 0;
   padding: 0 16px;
   color: #17283d;
-  font-size: 15px;
+  font-size: 11px;
   opacity: 1;
   border-bottom: 3px solid transparent;
   transition: color .2s, background .2s, border-color .2s;
@@ -48,7 +48,7 @@
 }
 
 .nav .main-menu span { font-size: 17px; }
-.nav .main-menu b { white-space: nowrap; }
+.nav .main-menu b { font-size: 16px; white-space: nowrap; }
 
 .nav .nav-cta {
   flex: 0 0 auto;
@@ -138,7 +138,8 @@
 
 @media (max-width: 1080px) {
   .nav { gap: 16px; }
-  .nav .main-menu a { width: 128px; min-width: 128px; padding: 0 10px; }
+  .nav .main-menu { grid-template-columns: repeat(4, 128px); }
+  .nav .main-menu a { padding: 0 10px; }
 }
 
 @media (max-width: 850px) {
@@ -153,9 +154,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
     height: 50px;
-    justify-content: flex-start;
     gap: 0;
     padding: 0 12px;
     overflow-x: auto;
@@ -164,7 +166,8 @@
   }
 
   .nav .main-menu::-webkit-scrollbar { display: none; }
-  .nav .main-menu a { flex: 0 0 auto; width: auto; min-width: 0; padding: 0 12px; font-size: 12px; }
+  .nav .main-menu a { width: 100%; min-width: 0; padding: 0 6px; font-size: 11px; letter-spacing: -.3px; }
+  .nav .main-menu b { font-size: 11px; }
   .nav .main-menu span { font-size: 15px; }
   .hero-copy { padding-top: 190px; }
 
@@ -183,22 +186,13 @@
   .nav .brand-mark { width: 32px; height: 32px; font-size: 19px; }
   .nav .nav-cta { padding: 9px 11px; font-size: 10px; }
   .nav .main-menu {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    width: 100%;
     padding: 0 6px;
     overflow: hidden;
   }
   .nav .main-menu a {
-    width: 100%;
-    max-width: 100%;
-    justify-content: center;
-    min-width: 0;
     gap: 3px;
     padding: 0 2px;
     overflow: hidden;
-    font-size: 11px;
-    letter-spacing: -.3px;
   }
   .nav .main-menu b { display: block; max-width: 100%; overflow: hidden; }
   .nav .main-menu span { font-size: 13px; }
