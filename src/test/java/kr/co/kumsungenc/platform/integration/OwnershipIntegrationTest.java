@@ -58,6 +58,22 @@ class OwnershipIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(content().json("[]"));
 
+        long quoteId=Objects.requireNonNull(jdbc.queryForObject(
+            "select id from quote_requests where receipt_number=?",Long.class,receipt));
+        long documentId=Objects.requireNonNull(jdbc.queryForObject("""
+            insert into quote_documents(quote_request_id,document_type,title,original_name,stored_name,content_type,file_size)
+            values (?,'ESTIMATE','소유권 검증 견적서','estimate.pdf','estimate.pdf','application/pdf',12)
+            returning id
+            """,Long.class,quoteId));
+
+        mvc.perform(get("/api/portal/quotes/{receipt}",receipt)
+                .with(user(stranger).roles("CUSTOMER")))
+            .andExpect(status().isNotFound());
+
+        mvc.perform(get("/api/portal/quotes/{receipt}/documents/{documentId}",receipt,documentId)
+                .with(user(stranger).roles("CUSTOMER")))
+            .andExpect(status().isNotFound());
+
         Long ownerId=jdbc.queryForObject("select owner_user_id from quote_requests where receipt_number=?",Long.class,receipt);
         assertNotNull(ownerId);
         Integer consents=jdbc.queryForObject("select count(*) from privacy_consents where lower(email)=lower(?)",Integer.class,owner);

@@ -67,8 +67,12 @@ public class PortalController {
     }
     @GetMapping("/quotes") public List<Map<String,Object>> quotes(Principal p,@RequestParam(defaultValue="100") int limit,@RequestParam(defaultValue="0") int offset){
         return jdbc.queryForList("""
-          select receipt_number,company_name,site_name,product_type,subject,status,assigned_to,created_at,updated_at
-          from quote_requests where owner_user_id=? order by created_at desc,id desc limit ? offset ?
+          select q.receipt_number,q.company_name,q.site_name,q.product_type,q.subject,q.status,
+          q.assigned_to,q.created_at,q.updated_at,
+          (select d.id from quote_documents d
+             where d.quote_request_id=q.id and d.document_type='ESTIMATE'
+             order by d.created_at desc,d.id desc limit 1) as latest_estimate_document_id
+          from quote_requests q where q.owner_user_id=? order by q.created_at desc,q.id desc limit ? offset ?
           """,userId(p),pageSize(limit),pageOffset(offset));
     }
     @GetMapping("/quotes/{receipt}") public Map<String,Object> quote(@PathVariable String receipt,Principal p){
