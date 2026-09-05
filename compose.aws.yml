@@ -21,7 +21,7 @@ services:
     build: .
     restart: unless-stopped
     environment:
-      SPRING_PROFILES_ACTIVE: prod,aws
+      SPRING_PROFILES_ACTIVE: prod,aws,naver-private
       DOMAIN: ${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
       APP_BASE_URL: https://${PUBLIC_DOMAIN:?PUBLIC_DOMAIN is required}
       DB_URL: ${DB_URL:?DB_URL is required}
@@ -51,9 +51,6 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ""
       ADMIN_PASSWORD_FILE: /run/secrets/admin_password
-      NAVER_LOGIN_ENABLED: ${NAVER_LOGIN_ENABLED:-false}
-      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID:-}
-      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET:-}
       EMAIL_OUTBOX_POLL_MS: ${EMAIL_OUTBOX_POLL_MS:-1000}
       EMAIL_OUTBOX_BATCH_SIZE: ${EMAIL_OUTBOX_BATCH_SIZE:-10}
       GOOGLE_SHEETS_ENABLED: ${GOOGLE_SHEETS_ENABLED:-false}

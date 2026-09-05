@@ -52,7 +52,7 @@ public class SecurityConfig {
           .authorizeHttpRequests(a -> a
             .requestMatchers("/","/index.html","/quote.html","/shop.html","/shop-payment-success.html","/shop-payment-fail.html","/projects.html","/support.html","/login.html","/naver-login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
                 "/api/auth/register","/api/auth/resend","/api/auth/verify","/api/auth/csrf","/api/auth/providers","/api/auth/password/**","/api/public/**",
-                "/oauth2/authorization/**","/login/oauth2/code/**",
+                "/oauth2/authorization/**","/auth/callback/**",
                 "/admin-invite.html","/api/auth/admin-account","/api/auth/admin-account/**",
                 "/actuator/health","/actuator/health/**","/error").permitAll()
             .requestMatchers("/shop-admin-entry.html","/api/shop-admin/access")
@@ -95,6 +95,7 @@ public class SecurityConfig {
           .logout(l -> l.logoutSuccessUrl("/").permitAll());
         if(clientRegistrations.getIfAvailable()!=null){
             http.oauth2Login(o -> o.loginPage("/login.html")
+                .redirectionEndpoint(redirection -> redirection.baseUri("/auth/callback/*"))
                 .userInfoEndpoint(userInfo -> userInfo.userService(naverUsers))
                 .successHandler((request,response,authentication) -> {
                     response.setStatus(HttpStatus.FOUND.value());

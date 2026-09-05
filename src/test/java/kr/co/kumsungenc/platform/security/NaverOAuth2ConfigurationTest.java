@@ -9,13 +9,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class NaverOAuth2ConfigurationTest {
     @Test void buildsNaverRegistrationFromExternalConfiguration(){
         ClientRegistrationRepository repository=new NaverOAuth2Configuration()
-            .naverClientRegistrationRepository("client-id","client-secret","https://example.com/");
+            .naverClientRegistrationRepository("client-id","client-secret",
+                "https://www.example.com/auth/callback/naver","https://example.com/");
         ClientRegistration registration=((InMemoryClientRegistrationRepository)repository)
             .findByRegistrationId("naver");
 
         assertNotNull(registration);
         assertEquals(ClientAuthenticationMethod.CLIENT_SECRET_POST,registration.getClientAuthenticationMethod());
-        assertEquals("https://example.com/login/oauth2/code/{registrationId}",registration.getRedirectUri());
+        assertEquals("https://www.example.com/auth/callback/naver",registration.getRedirectUri());
         assertEquals("https://nid.naver.com/oauth2.0/authorize",
             registration.getProviderDetails().getAuthorizationUri());
         assertEquals("https://openapi.naver.com/v1/nid/me",
@@ -24,7 +25,16 @@ class NaverOAuth2ConfigurationTest {
 
     @Test void rejectsEnabledLoginWithoutCredentials(){
         IllegalStateException error=assertThrows(IllegalStateException.class,()->new NaverOAuth2Configuration()
-            .naverClientRegistrationRepository("","","https://example.com"));
-        assertTrue(error.getMessage().contains("NAVER_CLIENT_ID"));
+            .naverClientRegistrationRepository("","","","https://example.com"));
+        assertTrue(error.getMessage().contains("Client ID"));
+    }
+
+    @Test void usesApplicationCallbackPathWhenNoExplicitCallbackWasConfigured(){
+        ClientRegistrationRepository repository=new NaverOAuth2Configuration()
+            .naverClientRegistrationRepository("client-id","client-secret","","https://example.com/");
+        ClientRegistration registration=((InMemoryClientRegistrationRepository)repository)
+            .findByRegistrationId("naver");
+
+        assertEquals("https://example.com/auth/callback/naver",registration.getRedirectUri());
     }
 }

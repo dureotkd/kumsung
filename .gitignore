@@ -1,5 +1,6 @@
 /target/
 /uploads/
+/src/main/resources/application-naver-private.yml
 /.idea/
 /.vscode/
 *.iml
