@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
@@ -18,10 +19,12 @@ public class AuthController {
     private final AppUserRepository users; private final PasswordEncoder encoder;
     private final EmailVerificationService verification;private final PrivacyConsentService privacy;
     private final ClientIpResolver clientIpResolver;
+    private final boolean naverLoginEnabled;
     public AuthController(AppUserRepository users,PasswordEncoder encoder,
-        EmailVerificationService verification,PrivacyConsentService privacy,ClientIpResolver clientIpResolver){
+        EmailVerificationService verification,PrivacyConsentService privacy,ClientIpResolver clientIpResolver,
+        @Value("${app.naver.enabled:false}") boolean naverLoginEnabled){
         this.users=users;this.encoder=encoder;this.verification=verification;this.privacy=privacy;
-        this.clientIpResolver=clientIpResolver;
+        this.clientIpResolver=clientIpResolver;this.naverLoginEnabled=naverLoginEnabled;
     }
 
     public record Registration(@NotBlank @Email String email,@NotBlank @Size(min=12,max=72) String password,
@@ -31,6 +34,9 @@ public class AuthController {
 
     @GetMapping("/csrf") public Map<String,String> csrf(CsrfToken token){
         return Map.of("headerName",token.getHeaderName(),"token",token.getToken());
+    }
+    @GetMapping("/providers") public Map<String,Boolean> providers(){
+        return Map.of("naver",naverLoginEnabled);
     }
     @GetMapping("/me") public Map<String,String> me(Authentication auth){
         AppUser u=users.findByEmailIgnoreCase(auth.getName()).orElseThrow();

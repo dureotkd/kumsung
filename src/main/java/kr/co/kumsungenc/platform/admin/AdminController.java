@@ -79,9 +79,9 @@ public class AdminController {
     }
     @GetMapping("/quotes/{id}") public Map<String,Object> quote(@PathVariable long id){
         Map<String,Object> r=new LinkedHashMap<>(jdbc.queryForMap("select * from quote_requests where id=?",id));
-        r.put("history",jdbc.queryForList("select * from quote_status_history where quote_request_id=? order by created_at",id));
+        r.put("history",jdbc.queryForList("select * from quote_status_history where quote_request_id=? order by created_at desc,id desc",id));
         r.put("attachments",jdbc.queryForList("select id,original_name,file_size,content_type from quote_attachments where quote_request_id=?",id));
-        r.put("documents",jdbc.queryForList("select id,document_type,title,original_name,approval_status,created_at from quote_documents where quote_request_id=?",id));
+        r.put("documents",jdbc.queryForList("select id,document_type,title,original_name,approval_status,created_at from quote_documents where quote_request_id=? order by created_at desc,id desc",id));
         r.put("messages",jdbc.queryForList("select * from quote_messages where quote_request_id=? order by created_at",id));
         return r;
     }

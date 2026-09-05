@@ -1,6 +1,7 @@
 package kr.co.kumsungenc.platform.security;
 
 import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,7 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.http.HttpStatus;
 import kr.co.kumsungenc.platform.shop.ShopAdminAccessService;
 
@@ -40,7 +42,8 @@ public class SecurityConfig {
     @Bean HttpSessionEventPublisher httpSessionEventPublisher(){return new HttpSessionEventPublisher();}
 
     @Bean SecurityFilterChain security(HttpSecurity http,RequestRateLimitFilter rateLimit,
-        SessionRegistry sessionRegistry) throws Exception {
+        SessionRegistry sessionRegistry,ObjectProvider<ClientRegistrationRepository> clientRegistrations,
+        NaverOAuth2UserService naverUsers) throws Exception {
         var csrf = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrf.setCookiePath("/");
         RequestMatcher apiRequest=request -> request.getRequestURI().startsWith(request.getContextPath()+"/api/");
@@ -48,7 +51,8 @@ public class SecurityConfig {
           .csrf(c -> c.csrfTokenRepository(csrf))
           .authorizeHttpRequests(a -> a
             .requestMatchers("/","/index.html","/quote.html","/shop.html","/shop-payment-success.html","/shop-payment-fail.html","/projects.html","/support.html","/login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
-                "/api/auth/register","/api/auth/resend","/api/auth/verify","/api/auth/csrf","/api/auth/password/**","/api/public/**",
+                "/api/auth/register","/api/auth/resend","/api/auth/verify","/api/auth/csrf","/api/auth/providers","/api/auth/password/**","/api/public/**",
+                "/oauth2/authorization/**","/login/oauth2/code/**",
                 "/admin-invite.html","/api/auth/admin-account","/api/auth/admin-account/**",
                 "/actuator/health","/actuator/health/**","/error").permitAll()
             .requestMatchers("/shop-admin-entry.html","/api/shop-admin/access")
@@ -89,6 +93,18 @@ public class SecurityConfig {
                 apiRequest)
             .accessDeniedHandler((request,response,denied) -> response.sendError(HttpStatus.FORBIDDEN.value())))
           .logout(l -> l.logoutSuccessUrl("/").permitAll());
+        if(clientRegistrations.getIfAvailable()!=null){
+            http.oauth2Login(o -> o.loginPage("/login.html")
+                .userInfoEndpoint(userInfo -> userInfo.userService(naverUsers))
+                .successHandler((request,response,authentication) -> {
+                    response.setStatus(HttpStatus.FOUND.value());
+                    response.setHeader("Location","/portal.html");
+                })
+                .failureHandler((request,response,exception) -> {
+                    response.setStatus(HttpStatus.FOUND.value());
+                    response.setHeader("Location","/login.html?oauthError=true");
+                }));
+        }
         http.addFilterBefore(rateLimit,UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

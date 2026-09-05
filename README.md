@@ -6,6 +6,12 @@
 
 견적·SMART SHOP의 선택적 Google Sheets 연동 방법은 [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md)를 참고하세요. 고객문의는 PostgreSQL과 관리자 페이지에서 직접 확인·답변하며 Sheets로 복제하지 않습니다.
 
+네이버 로그인을 사용하려면 네이버 개발자센터의 Callback URL에
+`{APP_BASE_URL}/login/oauth2/code/naver`를 등록하고 `NAVER_LOGIN_ENABLED=true`,
+`NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`을 설정합니다. 값이 없거나 기능이 비활성화된 환경에서는
+로그인 화면의 네이버 버튼이 자동으로 숨겨집니다. 네이버 애플리케이션의 제공 정보에서
+`연락처 이메일 주소` 사용 권한도 활성화해야 합니다.
+
 (주)금성이엔씨 온라인 견적접수 및 고객 업무 포털입니다.
 
 ## 핵심 기능

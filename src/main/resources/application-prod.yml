@@ -41,7 +41,8 @@ server:
       cookie:
         secure: true
         http-only: true
-        same-site: strict
+        # OAuth 로그인 콜백은 외부 사이트에서 돌아오는 최상위 GET 요청이므로 Lax가 필요하다.
+        same-site: lax
 
 management:
   endpoint:

@@ -83,13 +83,13 @@ public class PortalController {
           estimate_amount,estimate_notes,created_at,updated_at
           from quote_requests where id=?
           """,id));
-        result.put("history",jdbc.queryForList("select status,note,changed_by,created_at from quote_status_history where quote_request_id=? order by created_at",id));
+        result.put("history",jdbc.queryForList("select status,note,changed_by,created_at from quote_status_history where quote_request_id=? order by created_at desc,id desc",id));
         result.put("supplementalRequests",jdbc.queryForList("select id,request_text,status,requested_at,completed_at from supplemental_requests where quote_request_id=? order by requested_at desc",id));
         result.put("attachments",jdbc.queryForList("select id,original_name,content_type,file_size from quote_attachments where quote_request_id=? order by id",id));
         result.put("documents",jdbc.queryForList("""
             select id,document_type,title,original_name,file_size,approval_status,approved_at,
             contract_decision,contract_decision_note,contract_decided_at,created_at
-            from quote_documents where quote_request_id=? order by created_at desc
+            from quote_documents where quote_request_id=? order by created_at desc,id desc
             """,id));
         return result;
     }

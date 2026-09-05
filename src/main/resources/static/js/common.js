@@ -17,6 +17,14 @@ async function api(url,options={}){
 }
 const statusName={RECEIVED:"접수",REVIEWING:"검토 중",SUPPLEMENT_REQUIRED:"보완 요청",SUPPLEMENTED:"보완 완료",QUOTED:"견적 완료",APPROVED:"승인",COMPLETED:"완료",CANCELLED:"취소",PLANNING:"준비",IN_PROGRESS:"진행 중",PENDING:"대기"};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const compactSubmit=(label,icon)=>{
+  const paths={
+    mail:'<path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/>',
+    document:'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 14h6M12 11v6"/>',
+    upload:'<path d="M12 16V4m0 0-5 5m5-5 5 5M4 20h16"/>'
+  };
+  return `<button type="submit" class="primary icon-submit" aria-label="${esc(label)}" title="${esc(label)}"><svg viewBox="0 0 24 24" aria-hidden="true">${paths[icon]||paths.document}</svg></button>`;
+};
 const fmt=v=>v?new Date(v).toLocaleString("ko-KR"):"-";
 const PAGE_SIZE=25,pageOffsets=new Map();
 function resetPage(key){pageOffsets.set(key,0)}

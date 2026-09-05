@@ -16,5 +16,6 @@ load_secret MAIL_PASSWORD
 load_secret DB_PASSWORD
 load_secret ADMIN_PASSWORD
 load_secret TOSS_SECRET_KEY
+load_secret NAVER_CLIENT_SECRET
 
 exec java -XX:MaxRAMPercentage=75 -jar /app/app.jar

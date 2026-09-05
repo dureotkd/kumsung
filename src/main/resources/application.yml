@@ -49,6 +49,10 @@ app:
   support-email: ${SUPPORT_EMAIL:B2B@kumsungenc.co.kr}
   admin-email: ${ADMIN_EMAIL:}
   admin-password: ${ADMIN_PASSWORD:}
+  naver:
+    enabled: ${NAVER_LOGIN_ENABLED:false}
+    client-id: ${NAVER_CLIENT_ID:}
+    client-secret: ${NAVER_CLIENT_SECRET:}
   toss-payments:
     client-key: ${TOSS_CLIENT_KEY:}
     secret-key: ${TOSS_SECRET_KEY:}

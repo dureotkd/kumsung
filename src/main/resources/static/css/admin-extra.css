@@ -234,3 +234,30 @@
 @media (max-width: 720px) {
   .managed-grid { grid-template-columns: 1fr; }
 }
+
+.compact-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.modal .icon-submit {
+  display: inline-grid;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  margin: 0;
+  padding: 9px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  cursor: pointer;
+}
+
+.icon-submit svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.icon-submit:hover { filter: brightness(.92); }
+.icon-submit:focus-visible { outline: 3px solid rgba(47,125,79,.25); outline-offset: 2px; }
+.icon-submit:disabled { cursor: wait; opacity: .55; }
+.file-date { display: block; margin-top: 4px; color: var(--muted); }
