@@ -50,7 +50,7 @@ public class SecurityConfig {
         http
           .csrf(c -> c.csrfTokenRepository(csrf))
           .authorizeHttpRequests(a -> a
-            .requestMatchers("/","/index.html","/quote.html","/shop.html","/shop-payment-success.html","/shop-payment-fail.html","/projects.html","/support.html","/login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
+            .requestMatchers("/","/index.html","/quote.html","/shop.html","/shop-payment-success.html","/shop-payment-fail.html","/projects.html","/support.html","/login.html","/naver-login.html","/verify-email.html","/reset-password.html","/privacy.html","/css/**","/js/**","/images/**","/api/quotes",
                 "/api/auth/register","/api/auth/resend","/api/auth/verify","/api/auth/csrf","/api/auth/providers","/api/auth/password/**","/api/public/**",
                 "/oauth2/authorization/**","/login/oauth2/code/**",
                 "/admin-invite.html","/api/auth/admin-account","/api/auth/admin-account/**",
