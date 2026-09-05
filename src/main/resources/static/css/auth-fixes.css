@@ -279,6 +279,8 @@
   text-decoration: none;
 }
 
+.naver-processing-return[hidden] { display: none; }
+
 @keyframes naver-processing-spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
