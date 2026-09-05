@@ -207,13 +207,10 @@
   border: 0;
   border-radius: 50%;
   background: #03c75a;
-  box-shadow: 0 10px 24px rgba(3, 199, 90, .2);
   color: #fff;
   text-decoration: none;
-  transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease;
 }
 
-.naver-login-button:hover { background: #03b753; box-shadow: 0 12px 28px rgba(3, 199, 90, .28); transform: translateY(-1px); }
 .naver-login-button:focus-visible { outline: 3px solid rgba(3,199,90,.28); outline-offset: 2px; }
 .naver-login-button span { font: 900 22px Arial,sans-serif; line-height: 1; }
 
@@ -285,7 +282,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .naver-processing-spinner { animation-duration: 1.8s; }
-  .naver-login-button { transition: none; }
 }
 
 .reset-brand { position: fixed; top: 28px; left: max(24px,5vw); text-decoration: none; }
