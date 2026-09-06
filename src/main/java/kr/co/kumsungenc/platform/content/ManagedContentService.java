@@ -14,11 +14,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
 @Service
 public class ManagedContentService {
-    private static final Set<String> POST_TYPES=Set.of("COMPANY_NEWS","CONSTRUCTION_CASE");
+    private static final Set<String> POST_TYPES=Set.of(
+        "SNS_CHANNEL","NEW_DEVELOPMENT_PROGRAM","COMPANY_NEWS","CONSTRUCTION_CASE","OTHER_INQUIRY");
     private static final Set<String> INNOVATION_CATEGORIES=Set.of("RND","PATENT_CERT","TECHNICAL","KNOWLEDGE","SMART_FACTORY");
     private final JdbcTemplate jdbc;
     private final FileValidationService validation;
@@ -182,33 +184,49 @@ public class ManagedContentService {
     public List<Map<String,Object>> publicPosts(String type){
         String cleanType=postType(type);
         List<Map<String,Object>> rows=jdbc.queryForList("""
-            select id,post_type,title,content,pinned,created_at
+            select id,post_type,title,content,link_url,image_original_name,
+                   file_original_name,file_content_type,file_size,pinned,created_at
             from customer_media_posts where post_type=? and published=true
             order by pinned desc,created_at desc,id desc
             """,cleanType);
-        rows.forEach(row->row.put("imageUrl","/api/public/content/posts/"+row.get("id")+"/image"));
+        rows.forEach(row->addPostUrls(row,false));
         return rows;
     }
 
     public List<Map<String,Object>> adminPosts(int limit,int offset){
         List<Map<String,Object>> rows=jdbc.queryForList("""
-            select id,post_type,title,content,published,pinned,created_at,updated_at
+            select id,post_type,title,content,link_url,image_original_name,image_size,
+                   file_original_name,file_content_type,file_size,published,pinned,created_at,updated_at
             from customer_media_posts order by created_at desc,id desc limit ? offset ?
             """,pageSize(limit),pageOffset(offset));
-        rows.forEach(row->row.put("imageUrl","/api/public/content/posts/"+row.get("id")+"/image"));
+        rows.forEach(row->addPostUrls(row,true));
         return rows;
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public Map<String,Object> createPost(String type,String title,String content,boolean published,boolean pinned,
-        MultipartFile image) throws IOException{
-        String ext=validation.validateImage(image),reference=UUID.randomUUID().toString();
-        String key=StorageKeys.customerPostImage(reference,UUID.randomUUID()+"."+ext);
-        storage.store(image,key);
+    public Map<String,Object> createPost(String type,String title,String content,String linkUrl,boolean published,boolean pinned,
+        MultipartFile image,MultipartFile file) throws IOException{
+        String cleanType=postType(type),cleanTitle=required(title,"제목",180),cleanContent=optional(content,10000),cleanLink=optionalHttpUrl(linkUrl);
+        String imageExt=image!=null&&!image.isEmpty()?validation.validateImage(image):null;
+        String fileExt=file!=null&&!file.isEmpty()?validation.validateResourceFile(file):null;
+        String reference=UUID.randomUUID().toString();
+        String imageKey=null,imageName=null,imageType=null;Long imageSize=null;
+        String fileKey=null,fileName=null,fileType=null;Long fileSize=null;
+        if(imageExt!=null){
+            imageKey=StorageKeys.customerPostImage(reference,UUID.randomUUID()+"."+imageExt);
+            storage.store(image,imageKey);imageName=originalName(image);imageType=contentType(image);imageSize=image.getSize();
+        }
+        if(fileExt!=null){
+            fileKey=StorageKeys.customerPostFile(reference,UUID.randomUUID()+"."+fileExt);
+            storage.store(file,fileKey);fileName=originalName(file);fileType=contentType(file);fileSize=file.getSize();
+        }
         Long id=jdbc.queryForObject("""
-            insert into customer_media_posts(post_type,title,content,image_key,image_original_name,image_content_type,image_size,published,pinned)
-            values(?,?,?,?,?,?,?,?,?) returning id
-            """,Long.class,postType(type),required(title,"제목",180),optional(content,10000),key,originalName(image),contentType(image),image.getSize(),published,pinned);
+            insert into customer_media_posts(post_type,title,content,link_url,
+                image_key,image_original_name,image_content_type,image_size,
+                file_key,file_original_name,file_content_type,file_size,published,pinned)
+            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) returning id
+            """,Long.class,cleanType,cleanTitle,cleanContent,cleanLink,
+            imageKey,imageName,imageType,imageSize,fileKey,fileName,fileType,fileSize,published,pinned);
         return post(id);
     }
 
@@ -221,7 +239,7 @@ public class ManagedContentService {
     @Transactional(rollbackFor=Exception.class)
     public void deletePost(long id){
         Map<String,Object> row=post(id);jdbc.update("delete from customer_media_posts where id=?",id);
-        deleteAfterCommit((String)row.get("image_key"));
+        deleteAfterCommit((String)row.get("image_key"));deleteAfterCommit((String)row.get("file_key"));
     }
 
     public Map<String,Object> post(long id){return one("select * from customer_media_posts where id=?",id);}
@@ -229,7 +247,14 @@ public class ManagedContentService {
     public ObjectStorage.StoredObject postImage(long id,boolean publicOnly) throws IOException{
         Map<String,Object> row=post(id);
         if(publicOnly&&!Boolean.TRUE.equals(row.get("published")))throw new NoSuchElementException();
-        return storage.load((String)row.get("image_key"));
+        String key=(String)row.get("image_key");if(key==null)throw new NoSuchElementException();return storage.load(key);
+    }
+
+    public Download postDownload(long id,boolean publicOnly) throws IOException{
+        Map<String,Object> row=post(id);
+        if(publicOnly&&!Boolean.TRUE.equals(row.get("published")))throw new NoSuchElementException();
+        String key=(String)row.get("file_key");if(key==null)throw new NoSuchElementException();
+        return new Download(storage.load(key),(String)row.get("file_original_name"),(String)row.get("file_content_type"));
     }
 
     private Map<String,Object> one(String sql,Object...args){
@@ -241,6 +266,12 @@ public class ManagedContentService {
         if(row.get("image_key")!=null)row.put("imageUrl","/api/public/shop/products/"+row.get("id")+"/image");
         else row.put("imageUrl",row.get("image_url"));
     }
+    private void addPostUrls(Map<String,Object> row,boolean admin){
+        if(row.get("image_original_name")!=null)
+            row.put("imageUrl","/api/public/content/posts/"+row.get("id")+"/image");
+        if(row.get("file_original_name")!=null)
+            row.put("fileUrl",(admin?"/api/admin":"/api/public")+"/content/posts/"+row.get("id")+"/file");
+    }
     private String required(String value,String label,int max){
         String clean=value==null?"":value.trim();
         if(clean.isEmpty())throw new IllegalArgumentException(label+"을(를) 입력해 주세요.");
@@ -250,6 +281,15 @@ public class ManagedContentService {
     private String optional(String value,int max){
         if(value==null||value.trim().isEmpty())return null;
         String clean=value.trim();if(clean.length()>max)throw new IllegalArgumentException("입력 가능한 글자 수를 초과했습니다.");return clean;
+    }
+    private String optionalHttpUrl(String value){
+        String clean=optional(value,1000);if(clean==null)return null;
+        try{
+            URI uri=URI.create(clean);
+            if((!"http".equalsIgnoreCase(uri.getScheme())&&!"https".equalsIgnoreCase(uri.getScheme()))||!StringUtils.hasText(uri.getHost()))
+                throw new IllegalArgumentException();
+            return uri.toString();
+        }catch(Exception ignored){throw new IllegalArgumentException("외부 링크는 http 또는 https 주소로 입력해 주세요.");}
     }
     private String productCode(String value){
         String clean=required(value,"제품 코드",40).toUpperCase(Locale.ROOT);

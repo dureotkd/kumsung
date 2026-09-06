@@ -1,10 +1,11 @@
 package kr.co.kumsungenc.platform.content;
 
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -41,9 +42,18 @@ public class AdminContentController {
 
     @PostMapping(value="/posts",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String,Object> createPost(@RequestParam String type,@RequestParam String title,@RequestParam(required=false) String content,
+        @RequestParam(required=false) String linkUrl,
         @RequestParam(defaultValue="true") boolean published,@RequestParam(defaultValue="false") boolean pinned,
-        @RequestPart MultipartFile image) throws IOException{
-        return service.createPost(type,title,content,published,pinned,image);
+        @RequestPart(required=false) MultipartFile image,@RequestPart(required=false) MultipartFile file) throws IOException{
+        return service.createPost(type,title,content,linkUrl,published,pinned,image,file);
+    }
+
+    @GetMapping("/posts/{id}/file") public ResponseEntity<?> postFile(@PathVariable long id) throws IOException{
+        ManagedContentService.Download download=service.postDownload(id,false);
+        return ResponseEntity.ok().contentType(mediaType(download.contentType()))
+            .contentLength(download.object().contentLength())
+            .header(HttpHeaders.CONTENT_DISPOSITION,ContentDisposition.attachment().filename(download.filename(),StandardCharsets.UTF_8).build().toString())
+            .header(HttpHeaders.CACHE_CONTROL,"no-store").body(download.object().resource());
     }
 
     @PutMapping("/posts/{id}/status") public Map<String,String> postStatus(@PathVariable long id,@RequestBody PostStatus body){
@@ -56,4 +66,5 @@ public class AdminContentController {
 
     public record Published(boolean published){}
     public record PostStatus(boolean published,boolean pinned){}
+    private MediaType mediaType(String value){try{return MediaType.parseMediaType(value);}catch(Exception ignored){return MediaType.APPLICATION_OCTET_STREAM;}}
 }

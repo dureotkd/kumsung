@@ -28,7 +28,11 @@ public final class StorageKeys {
     }
 
     public static String customerPostImage(String reference, String storedName) {
-        return "content/customer/" + safe(reference) + "/" + safe(storedName);
+        return "content/customer/" + safe(reference) + "/image/" + safe(storedName);
+    }
+
+    public static String customerPostFile(String reference, String storedName) {
+        return "content/customer/" + safe(reference) + "/file/" + safe(storedName);
     }
 
     public static String normalize(String key) {

@@ -227,6 +227,8 @@
 .managed-check { display: flex !important; align-items: center; gap: 8px; width: fit-content; }
 .managed-check input { width: 17px; height: 17px; margin: 0; accent-color: var(--blue); }
 .managed-actions .secondary { background: #fff; }
+.managed-category-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.managed-category-strip span { padding: 7px 11px; border: 1px solid #cfe0d4; border-radius: 999px; background: #f2f8f4; color: #245b39; font-size: 11px; font-weight: 800; }
 .admin-thumb { width: 72px; height: 54px; border: 1px solid var(--line); border-radius: 4px; object-fit: cover; background: #edf4ef; }
 .admin-row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .admin-row-actions .danger { color: #a82d2d; border-color: #d7aaaa; }

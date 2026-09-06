@@ -41,6 +41,14 @@ public class PublicContentController {
         return image(service.postImage(id,true),(String)row.get("image_content_type"),(String)row.get("image_original_name"));
     }
 
+    @GetMapping("/posts/{id}/file") public ResponseEntity<?> postFile(@PathVariable long id) throws IOException{
+        ManagedContentService.Download download=service.postDownload(id,true);
+        return ResponseEntity.ok().contentType(mediaType(download.contentType()))
+            .contentLength(download.object().contentLength())
+            .header(HttpHeaders.CONTENT_DISPOSITION,ContentDisposition.attachment().filename(download.filename(),StandardCharsets.UTF_8).build().toString())
+            .header(HttpHeaders.CACHE_CONTROL,"no-store").body(download.object().resource());
+    }
+
     private ResponseEntity<?> image(ObjectStorage.StoredObject stored,String contentType,String filename){
         return ResponseEntity.ok().contentType(mediaType(contentType)).contentLength(stored.contentLength())
             .header(HttpHeaders.CONTENT_DISPOSITION,ContentDisposition.inline().filename(filename,StandardCharsets.UTF_8).build().toString())

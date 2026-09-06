@@ -50,6 +50,7 @@
           <span class="sync-channel-arrow" aria-hidden="true">↗</span>
         </a>
       </div>
+      <div id="snsChannelContent" class="sync-managed-grid" aria-live="polite"></div>
     </section>
 
     <section id="shared-programs" class="sync-section sync-pr-section">
@@ -61,6 +62,7 @@
           <span class="sync-program-arrow" aria-hidden="true">↗</span>
         </a>
       </div>
+      <div id="newProgramContent" class="sync-managed-grid" aria-live="polite"></div>
     </section>
 
     <section id="company-news" class="sync-section sync-pr-section">
@@ -79,6 +81,7 @@
     </section>
 
     <section id="support-inquiry" class="sync-section sync-inquiry-section sync-pr-section">
+      <div id="otherInquiryContent" class="sync-managed-grid sync-other-resources" aria-live="polite"></div>
       <div class="sync-inquiry-mini">
         <div class="sync-inquiry-heading">
           <span class="sync-tag">INQUIRY</span>
@@ -103,7 +106,7 @@
 
   <footer><a class="official-brand on-dark" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark" src="/images/kumsung-enc-ai-wordmark.png" alt="(주)금성이엔씨 KUMSUNG ENC"></a><p>산업의 내일을 만드는 기술 파트너</p><small>© 2026 KUMSUNG ENC CO., LTD. ALL RIGHTS RESERVED.</small></footer>
 
-<dialog id="contentDetailDialog" class="sync-detail-dialog"><button class="sync-dialog-close" type="button" aria-label="닫기">×</button><img id="contentDetailImage" class="sync-dialog-image" alt=""><div class="sync-dialog-body"><span id="contentDetailType" class="sync-tag"></span><h2 id="contentDetailTitle"></h2><p id="contentDetailText"></p><small id="contentDetailDate"></small></div></dialog>
+<dialog id="contentDetailDialog" class="sync-detail-dialog"><button class="sync-dialog-close" type="button" aria-label="닫기">×</button><img id="contentDetailImage" class="sync-dialog-image" alt="" hidden><div class="sync-dialog-body"><span id="contentDetailType" class="sync-tag"></span><h2 id="contentDetailTitle"></h2><p id="contentDetailText"></p><div class="sync-dialog-actions"><a id="contentDetailLink" target="_blank" rel="noopener noreferrer" hidden>외부 링크 열기 ↗</a><a id="contentDetailFile" hidden>첨부파일 다운로드</a></div><small id="contentDetailDate"></small></div></dialog>
 <script src="/js/support-content.js"></script>
 <script src="/js/memo-parser.js"></script>
 <script src="/js/public-support.js"></script>

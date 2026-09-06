@@ -3,6 +3,7 @@ package kr.co.kumsungenc.platform.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.kumsungenc.platform.content.ManagedContentService;
 import kr.co.kumsungenc.platform.shop.ShopAdminAccessService;
+import kr.co.kumsungenc.platform.shop.TossPaymentsClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.nio.charset.StandardCharsets;
 
@@ -36,6 +38,7 @@ class ManagedContentIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired ManagedContentService service;
+    @MockitoBean TossPaymentsClient tossPaymentsClient;
     Long innovationId;
     Long postId;
 
@@ -68,6 +71,12 @@ class ManagedContentIntegrationTest {
             .contains("data-view=\"innovation\">기술혁신센터")
             .contains("data-view=\"media\">홍보센터")
             .contains("기술혁신센터 자료 업로드")
+            .contains("value=\"SNS_CHANNEL\">SNS채널")
+            .contains("value=\"NEW_DEVELOPMENT_PROGRAM\">신개발 프로그램")
+            .contains("value=\"COMPANY_NEWS\" selected>회사소식")
+            .contains("value=\"CONSTRUCTION_CASE\">시공사례")
+            .contains("value=\"OTHER_INQUIRY\">그외 문의")
+            .contains("name=\"file\" type=\"file\"")
             .doesNotContain("data-view=\"business\"")
             .doesNotContain("id=\"business\"");
     }
@@ -142,6 +151,31 @@ class ManagedContentIntegrationTest {
             .andExpect(content().string(containsString("maei6519")));
         mvc.perform(get("/index.html"))
             .andExpect(status().isOk()).andExpect(content().string(containsString("homeCompanyNews")));
+    }
+
+    @Test
+    void administratorUploadsNewProgramAttachmentWithoutImageAndCustomerCanDownloadIt() throws Exception {
+        MockMultipartFile file=new MockMultipartFile("file","new-program.pdf","application/pdf",
+            "%PDF-1.4\nnew development program\n%%EOF".getBytes(StandardCharsets.US_ASCII));
+        String response=mvc.perform(multipart("/api/admin/content/posts").file(file)
+                .param("type","NEW_DEVELOPMENT_PROGRAM").param("title","신개발 프로그램 자료")
+                .param("content","관리자에서 등록한 첨부 자료입니다.")
+                .param("linkUrl","https://example.com/new-program")
+                .param("published","true").param("pinned","false")
+                .with(user("admin@example.com").roles("ADMIN")).with(csrf()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        postId=mapper.readTree(response).get("id").asLong();
+
+        mvc.perform(get("/api/public/content/posts").param("type","NEW_DEVELOPMENT_PROGRAM"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[?(@.id == "+postId+")].title").value(hasItem("신개발 프로그램 자료")))
+            .andExpect(jsonPath("$[?(@.id == "+postId+")].link_url").value(hasItem("https://example.com/new-program")))
+            .andExpect(jsonPath("$[?(@.id == "+postId+")].fileUrl").value(hasItem("/api/public/content/posts/"+postId+"/file")))
+            .andExpect(jsonPath("$[?(@.id == "+postId+")].imageUrl").doesNotExist());
+        mvc.perform(get("/api/public/content/posts/{id}/file",postId))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition",containsString("new-program.pdf")))
+            .andExpect(content().bytes(file.getBytes()));
     }
 
     private MockMultipartFile png(String part,String name){
