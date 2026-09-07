@@ -1,5 +1,5 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>로그인 | (주)금성이엔씨</title><link rel="stylesheet" href="/css/portal.css"><link rel="stylesheet" href="/css/company-brand.css"><link rel="stylesheet" href="/css/auth-fixes.css"><link rel="stylesheet" href="/css/portal-green.css"></head>
+<title>로그인 | (주)금성이엔씨</title><link rel="stylesheet" href="/css/portal.css"><link rel="stylesheet" href="/css/company-brand.css"><link rel="stylesheet" href="/css/auth-fixes.css"><link rel="stylesheet" href="/css/portal-green.css"><link rel="stylesheet" href="/css/business-info.css?v=20260907-1"></head>
 <body class="auth-page"><a class="auth-brand official-brand" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark official-brand-wordmark-korean" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
 <main class="auth-card"><div class="auth-copy"><p>SMART CUSTOMER PORTAL</p><h1>견적부터 납품까지,<br>한눈에 확인하세요.</h1><ul><li>실시간 견적 진행상태</li><li>보완자료와 견적서 관리</li><li>계약·납품·A/S 통합 조회</li></ul></div>
 <section class="auth-form"><div class="tabs"><button class="active" data-tab="login">로그인</button><button data-tab="register">회원가입</button></div>
@@ -7,6 +7,21 @@
 <form id="register" hidden><h2>회원가입</h2><div class="two"><label>회사명<input name="companyName" required></label><label>담당자명<input name="name" required></label></div><label>연락처<input name="phone" required></label><label>이메일<input type="email" name="email" required></label><label>비밀번호 <small>12자 이상</small><input type="password" minlength="12" name="password" required></label><label class="privacy-check"><input type="checkbox" name="privacyAgreed" required><span><a href="/privacy.html" target="_blank">개인정보 처리방침</a>에 동의합니다.</span></label><button>회원가입</button><div class="verification-help"><p>이미 가입했지만 인증메일을 받지 못하셨나요?</p><button type="button" class="secondary-action" id="existingResendButton">인증 이메일 다시 받기</button></div></form>
 <section id="registrationComplete" class="registration-complete" hidden aria-live="polite"><span class="completion-mark" aria-hidden="true">✓</span><h2>회원가입이 완료되었습니다.</h2><p><strong id="registeredEmail"></strong><span>주소로 인증 이메일을 발송했습니다.</span></p><p class="completion-guide">이메일에서 인증을 완료한 후 로그인해 주세요.<br>인증 주소는 24시간 동안 유효합니다.</p><button type="button" id="completionResendButton">인증 이메일 다시 보내기</button><button type="button" class="secondary-action" id="goToLoginButton">로그인 화면으로 이동</button></section>
 <p id="authMessage"></p><a class="home-link" href="/">← 견적접수 화면으로</a></section></main>
+<footer class="auth-business-footer">
+    <section class="business-info" aria-label="사업자 정보">
+      <h2>사업자 정보</h2>
+      <dl>
+        <div><dt>상호명</dt><dd>(주)금성이엔씨</dd></div>
+        <div><dt>대표자명</dt><dd>채오석</dd></div>
+        <div><dt>사업자등록번호</dt><dd>127-86-51583</dd></div>
+        <div class="business-info-address"><dt>사업장 주소</dt><dd>경기도 양주시 남면 삼육사로327번길 57-8, 제2동</dd></div>
+        <div><dt>전화번호</dt><dd><a href="tel:0318648364">031-864-8364</a></dd></div>
+        <div><dt>이메일</dt><dd><a href="mailto:cos78@hanmail.net">cos78@hanmail.net</a></dd></div>
+        <div><dt>팩스</dt><dd>031-864-8365</dd></div>
+      </dl>
+    </section>
+  <a class="business-privacy-link" href="/privacy.html">개인정보 처리방침</a>
+</footer>
 <script src="/js/common.js"></script><script>
 const tabButtons=document.querySelectorAll(".tabs button");
 function showTab(tab,clearMessage=true){tabButtons.forEach(button=>button.classList.toggle("active",button.dataset.tab===tab));login.hidden=tab!=="login";register.hidden=tab!=="register";registrationComplete.hidden=true;if(clearMessage)authMessage.textContent=""}

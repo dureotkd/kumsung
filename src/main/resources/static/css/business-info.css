@@ -1,0 +1,105 @@
+/* Keep business details available as page content on both desktop and mobile. */
+footer .business-info {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #ffffff29;
+  color: #c8d3dd;
+  font-size: 13px;
+  line-height: 1.8;
+  text-align: left;
+}
+
+footer .business-info h2 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+footer .business-info dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 28px;
+  margin: 0;
+}
+
+footer .business-info dl > div {
+  display: flex;
+  gap: 9px;
+  min-width: 0;
+}
+
+footer .business-info .business-info-address {
+  flex-basis: 100%;
+}
+
+footer .business-info dt {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+footer .business-info dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+footer .business-info a {
+  display: inline;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-page .auth-business-footer {
+  width: min(970px, 92vw);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 22px 28px;
+  border: 1px solid #dbe5dd;
+  background: #fff;
+}
+
+.auth-business-footer .business-info {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #45594c;
+}
+
+.auth-business-footer .business-info h2 {
+  color: #173d27;
+}
+
+.auth-business-footer .business-privacy-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #226c43;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 850px) {
+  .auth-page .auth-business-footer {
+    width: 100%;
+    max-width: 560px;
+    padding: 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  footer .business-info dl {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  footer .business-info dt {
+    flex-basis: 104px;
+  }
+}
