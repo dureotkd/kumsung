@@ -8,12 +8,14 @@ import org.springframework.security.oauth2.core.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class NaverOAuth2UserService implements OAuth2UserService<OAuth2UserRequest,OAuth2User> {
     private static final String PROVIDER="NAVER";
+    private static final SecureRandom RANDOM=new SecureRandom();
     private final OAuth2UserService<OAuth2UserRequest,OAuth2User> delegate;
     private final OAuthIdentityRepository identities;
     private final AppUserRepository users;
@@ -61,7 +63,7 @@ public class NaverOAuth2UserService implements OAuth2UserService<OAuth2UserReque
     private AppUser linkOrCreate(Map<String,Object> profile,String email,String providerUserId){
         AppUser user=users.findByEmailIgnoreCase(email).orElseGet(() -> {
             AppUser created=new AppUser();created.setEmail(email);
-            created.setPasswordHash(passwordEncoder.encode(UUID.randomUUID()+":"+UUID.randomUUID()));
+            created.setPasswordHash(passwordEncoder.encode(randomInternalPassword()));
             created.setName(displayName(profile));created.setPhone(optional(profile,"mobile",30));
             created.setRole("CUSTOMER");created.setEnabled(true);created.setEmailVerified(true);
             created.setVerifiedAt(LocalDateTime.now());return users.save(created);
@@ -74,6 +76,12 @@ public class NaverOAuth2UserService implements OAuth2UserService<OAuth2UserReque
         OAuthIdentity identity=new OAuthIdentity();identity.setUser(user);identity.setProvider(PROVIDER);
         identity.setProviderUserId(providerUserId);identities.save(identity);
         return user;
+    }
+
+    private String randomInternalPassword(){
+        // 256 random bits produce 43 ASCII bytes, below BCrypt's 72-byte limit.
+        byte[] bytes=new byte[32];RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private Map<String,Object> profile(Map<String,Object> attributes){

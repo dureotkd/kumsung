@@ -2,12 +2,14 @@ package kr.co.kumsungenc.platform.security;
 
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.*;
 import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.time.Instant;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +24,7 @@ class NaverOAuth2UserServiceTest {
 
     @BeforeEach void setUp(){
         delegate=mock(OAuth2UserService.class);identities=mock(OAuthIdentityRepository.class);
-        users=mock(AppUserRepository.class);encoder=mock(PasswordEncoder.class);
+        users=mock(AppUserRepository.class);encoder=spy(new BCryptPasswordEncoder());
         service=new NaverOAuth2UserService(delegate,identities,users,encoder);
     }
 
@@ -51,7 +53,6 @@ class NaverOAuth2UserServiceTest {
         when(delegate.loadUser(any())).thenReturn(remoteUser);
         when(identities.findByProviderAndProviderUserId("NAVER","new-naver-id")).thenReturn(Optional.empty());
         when(users.findByEmailIgnoreCase("new@example.com")).thenReturn(Optional.empty());
-        when(encoder.encode(anyString())).thenReturn("encoded-random-password");
         when(users.save(any(AppUser.class))).thenAnswer(invocation->invocation.getArgument(0));
 
         OAuth2User principal=service.loadUser(request());
@@ -62,6 +63,33 @@ class NaverOAuth2UserServiceTest {
         assertEquals("010-1234-5678",user.getValue().getPhone());
         assertTrue(user.getValue().isEmailVerified());
         assertEquals("CUSTOMER",user.getValue().getRole());
+        assertTrue(user.getValue().isEnabled());
+        assertNotNull(user.getValue().getVerifiedAt());
+        ArgumentCaptor<CharSequence> password=ArgumentCaptor.forClass(CharSequence.class);
+        verify(encoder).encode(password.capture());
+        String generated=password.getValue().toString();
+        assertTrue(generated.getBytes(StandardCharsets.UTF_8).length<=72);
+        assertNotEquals(generated,user.getValue().getPasswordHash());
+        assertTrue(encoder.matches(generated,user.getValue().getPasswordHash()));
+        ArgumentCaptor<OAuthIdentity> identity=ArgumentCaptor.forClass(OAuthIdentity.class);
+        verify(identities).save(identity.capture());
+        assertSame(user.getValue(),identity.getValue().getUser());
+        assertEquals("new-naver-id",identity.getValue().getProviderUserId());
+        assertTrue(principal.getAuthorities().stream().anyMatch(a->"ROLE_CUSTOMER".equals(a.getAuthority())));
+    }
+
+    @Test void generatesDifferentInternalPasswordsForNewCustomers(){
+        OAuth2User first=remote(Map.of("id","first-id","email","first@example.com"));
+        OAuth2User second=remote(Map.of("id","second-id","email","second@example.com"));
+        when(delegate.loadUser(any())).thenReturn(first,second);
+        when(users.save(any(AppUser.class))).thenAnswer(invocation->invocation.getArgument(0));
+
+        service.loadUser(request());
+        service.loadUser(request());
+
+        ArgumentCaptor<CharSequence> passwords=ArgumentCaptor.forClass(CharSequence.class);
+        verify(encoder,times(2)).encode(passwords.capture());
+        assertNotEquals(passwords.getAllValues().get(0),passwords.getAllValues().get(1));
     }
 
     @Test void rejectsProfileWhenEmailWasNotProvided(){
