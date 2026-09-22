@@ -39,6 +39,15 @@ class CustomerProfileIntegrationTest {
     @MockitoBean TossPaymentsClient toss;
     @MockitoBean FileStorageService storage;
 
+    @Test void anonymousPagesKeepLoginOnPublicHostWhileApisRemainUnauthorized() throws Exception {
+        for(String page:List.of("/profile.html","/portal.html")){
+            mvc.perform(get(page).header("Host","origin.kumsungenc.co.kr").accept(MediaType.TEXT_HTML))
+                .andExpect(status().isFound()).andExpect(header().string("Location","/login.html"));
+        }
+        mvc.perform(get("/api/auth/me").accept(MediaType.TEXT_HTML))
+            .andExpect(status().isUnauthorized()).andExpect(header().doesNotExist("Location"));
+    }
+
     @Test void naverProfileAppearsInAdminAndQuoteBelongsToSessionNotContactEmail() throws Exception {
         String email="naver-"+UUID.randomUUID()+"@example.com";
         long id=createCustomer(email,false);

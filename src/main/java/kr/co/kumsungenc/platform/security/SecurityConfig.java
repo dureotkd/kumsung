@@ -91,6 +91,11 @@ public class SecurityConfig {
           .exceptionHandling(e -> e
             .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                 apiRequest)
+            .defaultAuthenticationEntryPointFor((request,response,exception) -> {
+                // Keep browser logins on the public host when a reverse proxy uses an origin host.
+                response.setStatus(HttpStatus.FOUND.value());
+                response.setHeader("Location",request.getContextPath()+"/login.html");
+            },request -> !apiRequest.matches(request))
             .accessDeniedHandler((request,response,denied) -> response.sendError(HttpStatus.FORBIDDEN.value())))
           .logout(l -> l.logoutSuccessUrl("/").permitAll());
         if(clientRegistrations.getIfAvailable()!=null){
