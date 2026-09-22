@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import kr.co.kumsungenc.platform.security.ClientIpResolver;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/quotes")
@@ -21,8 +22,8 @@ public class QuoteController {
     public ResponseEntity<Map<String,String>> submit(
             @Valid @RequestPart("request") QuoteForm form,
             @RequestPart(value="files", required=false) List<MultipartFile> files,
-            HttpServletRequest request) throws IOException {
-        QuoteRequest saved = service.submit(form, files == null ? List.of() : files,clientIpResolver.resolve(request),request.getHeader("User-Agent"));
+            HttpServletRequest request,Authentication authentication) throws IOException {
+        QuoteRequest saved = service.submit(form, files == null ? List.of() : files,clientIpResolver.resolve(request),request.getHeader("User-Agent"),authentication);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("receiptNumber", saved.getReceiptNumber(), "message", "견적 요청이 접수되었습니다."));
     }

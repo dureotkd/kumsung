@@ -1,6 +1,7 @@
 package kr.co.kumsungenc.platform.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.kumsungenc.platform.shop.TossPaymentsClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.*;
 
@@ -34,6 +36,8 @@ class OwnershipIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
     @Autowired ObjectMapper mapper;
+    // Quote ownership tests do not call the external payment gateway.
+    @MockitoBean TossPaymentsClient tossPaymentsClient;
 
     @Test
     void verifiedOwnerCanClaimExistingQuoteButAnotherCustomerCannot() throws Exception {

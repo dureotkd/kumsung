@@ -34,4 +34,12 @@ public class AppUser {
     public void setEmailVerified(boolean v){emailVerified=v;}
     public LocalDateTime getVerifiedAt(){return verifiedAt;}
     public void setVerifiedAt(LocalDateTime v){verifiedAt=v;}
+    public boolean hasCompleteProfile(){
+        return name!=null&&!name.isBlank()&&!"네이버 회원".equals(name.trim())
+            &&companyName!=null&&!companyName.isBlank()&&validPhone(phone);
+    }
+    public static boolean validPhone(String value){
+        if(value==null||!value.matches("[0-9+()\\- ]{7,30}"))return false;
+        int digits=value.replaceAll("\\D","").length();return digits>=7&&digits<=15;
+    }
 }

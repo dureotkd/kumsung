@@ -8,6 +8,26 @@ const quoteMemo = document.querySelector("#quoteMemo");
 const productHint = document.querySelector("#productHint");
 
 let selected = [];
+let quoteMember = null;
+const memberInfo=document.getElementById("memberInfo");
+const memberInfoMessage=document.getElementById("memberInfoMessage");
+const memberReady=(async()=>{
+  try{
+    const response=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json"}});
+    if(!response.ok)return;
+    const me=await response.json();
+    if(me.role!=="CUSTOMER")return;
+    quoteMember=me;memberInfo.hidden=false;
+    quoteMemo.value=fillQuoteMemoFromProfile(quoteMemo.value,me);
+    const complete=me.profileComplete==="true";
+    memberInfoMessage.textContent=complete
+      ?`${me.name}님의 회원정보를 불러왔습니다. 견적은 현재 로그인 계정에 연결됩니다. 아래 연락 정보를 바꿔도 회원정보는 변경되지 않습니다.`
+      :"견적 신청 전에 회원 기본정보(회사명·담당자명·연락처)를 저장해 주세요.";
+    form.querySelector(".submit").disabled=!complete;
+  }catch(_){
+    // A public guest form remains available if the optional profile lookup fails.
+  }
+})();
 
 const quoteFields = {
   "제품명": { key: "productType", label: "제품명", max: 80 },
@@ -154,6 +174,10 @@ drop.addEventListener("drop", (event) => add(event.dataTransfer.files));
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  await memberReady;
+  if(quoteMember&&quoteMember.profileComplete!=="true"){
+    message.textContent="위의 ‘회원 기본정보 확인·수정’에서 정보를 저장한 후 신청해 주세요.";return;
+  }
   message.textContent = "";
   if (!form.reportValidity()) return;
 
@@ -189,6 +213,7 @@ form.addEventListener("submit", async (event) => {
     document.querySelector("#receipt").textContent = result.receiptNumber;
     dialog.showModal();
     form.reset();
+    if(quoteMember)quoteMemo.value=fillQuoteMemoFromProfile(quoteMemo.value,quoteMember);
     selected = [];
     render();
     updateProductHint();

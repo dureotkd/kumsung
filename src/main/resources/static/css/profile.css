@@ -1,0 +1,11 @@
+.profile-guide { color: #52665a; font-size: 14px; line-height: 1.8; word-break: keep-all; }
+#profileFields { min-width: 0; margin: 0; padding: 0; border: 0; }
+#profileForm input[readonly] { background: #edf2ee; color: #52665a; }
+#emailHelp { display: block; color: #637069; line-height: 1.6; }
+#profileMessage { min-height: 1.6em; color: #a02e20; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+#profileSave { width: 100%; margin-top: 15px; padding: 14px; border: 0; background: #2f7d4f; color: #fff; font-weight: 700; cursor: pointer; }
+#profileSave:disabled { opacity: .6; cursor: wait; }
+.member-info-note { margin: 0 0 18px; padding: 14px 16px; background: #edf5ef; border: 1px solid #c3d7c9; color: #254b34; font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
+.member-info-note[hidden] { display: none; }
+.member-info-note p { margin: 0 0 6px; }
+.member-info-note a { color: #1d663b; text-decoration: underline; font-weight: 700; }

@@ -43,7 +43,7 @@ public class SecurityConfig {
 
     @Bean SecurityFilterChain security(HttpSecurity http,RequestRateLimitFilter rateLimit,
         SessionRegistry sessionRegistry,ObjectProvider<ClientRegistrationRepository> clientRegistrations,
-        NaverOAuth2UserService naverUsers) throws Exception {
+        NaverOAuth2UserService naverUsers,CustomerLoginSuccessHandler customerLoginSuccess) throws Exception {
         var csrf = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrf.setCookiePath("/");
         RequestMatcher apiRequest=request -> request.getRequestURI().startsWith(request.getContextPath()+"/api/");
@@ -97,10 +97,7 @@ public class SecurityConfig {
             http.oauth2Login(o -> o.loginPage("/login.html")
                 .redirectionEndpoint(redirection -> redirection.baseUri("/auth/callback/*"))
                 .userInfoEndpoint(userInfo -> userInfo.userService(naverUsers))
-                .successHandler((request,response,authentication) -> {
-                    response.setStatus(HttpStatus.FOUND.value());
-                    response.setHeader("Location","/portal.html");
-                })
+                .successHandler(customerLoginSuccess)
                 .failureHandler((request,response,exception) -> {
                     response.setStatus(HttpStatus.FOUND.value());
                     response.setHeader("Location","/login.html?oauthError=true");

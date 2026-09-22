@@ -132,7 +132,7 @@
     <section id="service" class="view"><div class="panel"><div class="panel-head"><h2>A/S 요청</h2><button class="action" onclick="openServiceDialog()">A/S 요청</button></div><div id="serviceTable"></div></div></section>
     <section id="notices" class="view"><div class="panel"><h2>공지사항</h2><div id="noticeList"></div></div></section>
     <section id="support" class="view"><div class="panel"><div class="panel-head"><h2>고객센터</h2><button class="action" onclick="supportDialog.showModal()">문의하기</button></div><div id="supportList"></div></div></section>
-    <section id="privacy" class="view"><div class="panel"><h2>개인정보 관리</h2><p>보관 중인 개인정보를 JSON 파일로 내려받거나 계정을 삭제할 수 있습니다.</p><button class="action" onclick="exportPrivacy()">내 데이터 내려받기</button> <button class="action danger" onclick="deleteAccount()">계정 및 개인정보 삭제</button><p><a href="/privacy.html" target="_blank">개인정보 처리방침 보기</a></p></div></section>
+    <section id="privacy" class="view"><div class="panel"><h2>개인정보 관리</h2><p><a class="action" href="/profile.html?next=%2Fportal.html%23privacy">회원 기본정보 확인·수정</a></p><p>보관 중인 개인정보를 JSON 파일로 내려받거나 계정을 삭제할 수 있습니다.</p><button class="action" onclick="exportPrivacy()">내 데이터 내려받기</button> <button class="action danger" onclick="deleteAccount()">계정 및 개인정보 삭제</button><p><a href="/privacy.html" target="_blank">개인정보 처리방침 보기</a></p></div></section>
   </main>
 </div>
 
@@ -140,6 +140,6 @@
 <dialog id="serviceDialog"><form class="modal" id="serviceForm"><div class="modal-head"><h2>A/S 요청</h2><button type="button" onclick="serviceDialog.close()">×</button></div><label>관련 프로젝트<select name="projectId" id="serviceProject"><option value="">프로젝트 미지정</option></select></label><label>제목<input name="title" required></label><label>상세 내용<textarea name="details" rows="6" required></textarea></label><button class="primary">요청하기</button></form></dialog>
 <dialog id="supportDialog"><form class="modal" id="supportForm"><div class="modal-head"><h2>고객센터 문의</h2><button type="button" onclick="supportDialog.close()">×</button></div><label>제목<input name="subject" required></label><label>문의 내용<textarea name="message" rows="6" required></textarea></label><button class="primary">문의하기</button></form></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/js/common.js"></script><script src="/js/portal.js"></script>
+<script src="/js/common.js"></script><script src="/js/portal.js?v=20260922-1"></script>
 </body>
 </html>

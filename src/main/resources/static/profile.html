@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>회원 기본정보 | (주)금성이엔씨</title>
+  <link rel="stylesheet" href="/css/portal.css"><link rel="stylesheet" href="/css/company-brand.css">
+  <link rel="stylesheet" href="/css/auth-fixes.css"><link rel="stylesheet" href="/css/portal-green.css">
+  <link rel="stylesheet" href="/css/profile.css?v=20260922-1">
+</head>
+<body class="auth-page">
+  <a class="auth-brand official-brand" href="/" aria-label="(주)금성이엔씨 홈"><span class="official-logo"><img src="/images/kumsung-enc-symbol.png" alt=""></span><img class="official-brand-wordmark official-brand-wordmark-korean" src="/images/kumsung-enc-ai-korean-wordmark.png" alt="(주)금성이엔씨"></a>
+  <main class="auth-card">
+    <div class="auth-copy"><p>MEMBER INFORMATION</p><h1>견적 상담에 필요한<br>기본정보를 확인해 주세요.</h1><ul><li>네이버에서 받은 정보는 자동 입력</li><li>회사명과 연락처는 직접 확인</li><li>저장한 정보로 다음 견적도 간편하게</li></ul></div>
+    <section class="auth-form">
+      <h2>회원 기본정보</h2>
+      <p class="profile-guide">회사명·담당자명·연락처를 저장하면 회원정보와 견적 신청에 함께 반영됩니다. 개인 고객은 회사명에 ‘개인’을 입력해 주세요.</p>
+      <form id="profileForm">
+        <fieldset id="profileFields" disabled>
+          <label>가입 이메일<input name="email" type="email" readonly autocomplete="email" aria-describedby="emailHelp"></label>
+          <small id="emailHelp">로그인 계정의 이메일입니다. 견적을 받을 이메일은 신청 화면에서 변경할 수 있습니다.</small>
+          <label>회사명 <small>(필수)</small><input name="companyName" required maxlength="150" autocomplete="organization"></label>
+          <label>담당자명 <small>(필수)</small><input name="name" required maxlength="60" autocomplete="name"></label>
+          <label>연락처 <small>(필수)</small><input name="phone" type="tel" required maxlength="30" autocomplete="tel" placeholder="010-1234-5678"></label>
+          <label class="privacy-check"><input name="privacyAgreed" type="checkbox" required><span>견적 상담 및 회원 관리를 위한 <a href="/privacy.html" target="_blank" rel="noopener">개인정보 수집 및 이용</a>에 동의합니다. (필수)</span></label>
+          <button id="profileSave" type="submit">저장하고 계속하기</button>
+        </fieldset>
+      </form>
+      <p id="profileMessage" role="status" aria-live="polite">회원정보를 불러오는 중입니다.</p>
+      <a class="home-link" href="/">← 홈페이지로</a>
+    </section>
+  </main>
+  <script src="/js/common.js"></script><script src="/js/profile.js?v=20260922-1"></script>
+</body>
+</html>

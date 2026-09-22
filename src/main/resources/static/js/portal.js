@@ -40,6 +40,7 @@ function fmtDate(value){if(!value)return "-";return new Date(value).toLocaleDate
 async function init(){
   const me=await api("/api/auth/me");
   if(me.role==="ADMIN"){location.replace(me.adminRole==="SHOP_ADMIN"?"/shop-admin-entry.html":"/admin.html");return}
+  if(me.profileComplete==="false"){location.replace("/profile.html");return}
   $("userName").textContent=me.name;
   $("companyName").textContent=me.companyName||"개인 고객";
   $("welcomeName").textContent=me.name;

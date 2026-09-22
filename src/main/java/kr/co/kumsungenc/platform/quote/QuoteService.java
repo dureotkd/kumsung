@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import kr.co.kumsungenc.platform.security.AppUserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 
 @Service
 public class QuoteService {
@@ -27,20 +30,23 @@ public class QuoteService {
     private final FileStorageService fileStorage;
     private final TransactionTemplate transactions;
     private final GoogleSheetsOutboxService sheets;
+    private final AppUserRepository users;
 
     public QuoteService(QuoteRequestRepository repository,
                         @Value("${app.quote-recipient}") String recipient,
                         JdbcTemplate jdbc,FileValidationService fileValidation,
                         FileStorageService fileStorage,EmailOutboxService outbox,PrivacyConsentService privacy,
-                        TransactionTemplate transactions,GoogleSheetsOutboxService sheets) {
+                        TransactionTemplate transactions,GoogleSheetsOutboxService sheets,AppUserRepository users) {
         this.repository = repository;
         this.recipient = recipient; this.jdbc = jdbc;
         this.fileValidation=fileValidation;this.fileStorage=fileStorage;this.outbox=outbox;this.privacy=privacy;
         this.transactions=transactions;
         this.sheets=sheets;
+        this.users=users;
     }
 
-    public QuoteRequest submit(QuoteForm form, List<MultipartFile> files,String ip,String userAgent) throws IOException {
+    public QuoteRequest submit(QuoteForm form, List<MultipartFile> files,String ip,String userAgent,Authentication authentication) throws IOException {
+        Long ownerId=ownerId(form.email(),authentication);
         fileValidation.validateBatch(files);
         for(MultipartFile file:files)if(!file.isEmpty())fileValidation.validateQuoteFile(file);
         QuoteRequest q = new QuoteRequest();
@@ -52,9 +58,7 @@ public class QuoteService {
         q.setProductType(form.productType()); q.setSubject(form.subject());
         q.setDetails(form.details()); q.setCustomerWebhardUrl(blankToNull(form.webhardUrl()));
         q.setDesiredDate(form.desiredDate());
-        List<Long> owners=jdbc.query("select id from app_users where lower(email)=lower(?) and role='CUSTOMER' and email_verified=true and enabled=true",
-            (rs,n)->rs.getLong(1),form.email());
-        if(!owners.isEmpty())q.setOwnerUserId(owners.getFirst());
+        q.setOwnerUserId(ownerId);
 
         List<String> storedKeys=new ArrayList<>();
         try{
@@ -89,6 +93,23 @@ public class QuoteService {
             for(String key:storedKeys)try{fileStorage.delete(key);}catch(IOException ignored){}
             throw e;
         }
+    }
+
+    private Long ownerId(String contactEmail,Authentication authentication){
+        if(authentication!=null&&authentication.isAuthenticated()&&authentication.getAuthorities().stream()
+            .anyMatch(authority->"ROLE_CUSTOMER".equals(authority.getAuthority()))){
+            var user=users.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(()->new AccessDeniedException("회원정보를 확인할 수 없습니다."));
+            if(!"CUSTOMER".equals(user.getRole())||!user.isEnabled()||!user.isEmailVerified())
+                throw new AccessDeniedException("사용할 수 없는 회원 계정입니다.");
+            if(!user.hasCompleteProfile())
+                throw new IllegalArgumentException("회원 기본정보(회사명·담당자명·연락처)를 먼저 저장해 주세요.");
+            return user.getId();
+        }
+        // Preserve guest submissions; a logged-in customer's session always takes precedence.
+        List<Long> owners=jdbc.query("select id from app_users where lower(email)=lower(?) and role='CUSTOMER' and email_verified=true and enabled=true",
+            (rs,n)->rs.getLong(1),contactEmail);
+        return owners.isEmpty()?null:owners.getFirst();
     }
 
     private void sendNotifications(QuoteRequest q) {

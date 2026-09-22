@@ -43,9 +43,30 @@ public class AuthController {
         Map<String,String> result=new java.util.LinkedHashMap<>();
         result.put("email",u.getEmail());result.put("name",u.getName());
         result.put("companyName",u.getCompanyName()==null?"":u.getCompanyName());
+        result.put("phone",u.getPhone()==null?"":u.getPhone());
+        result.put("profileComplete",Boolean.toString(u.hasCompleteProfile()));
         result.put("role",u.getRole());
         result.put("adminRole",u.getAdminRole()==null?"":u.getAdminRole());
         return result;
+    }
+    public record Profile(@NotBlank @Size(max=60) String name,
+        @NotBlank @Size(max=150) String companyName,@NotBlank @Size(max=30) String phone,
+        @AssertTrue(message="개인정보 수집 및 이용에 동의해 주세요.") boolean privacyAgreed){}
+
+    @PutMapping("/profile") @Transactional
+    public Map<String,String> updateProfile(@Valid @RequestBody Profile profile,Authentication auth,HttpServletRequest request){
+        AppUser user=users.findByEmailIgnoreCase(auth.getName()).orElseThrow();
+        if(!"CUSTOMER".equals(user.getRole())||!user.isEnabled()||!user.isEmailVerified())
+            throw new org.springframework.security.access.AccessDeniedException("회원정보를 변경할 수 없습니다.");
+        if(!AppUser.validPhone(profile.phone().trim()))
+            throw new IllegalArgumentException("연락처는 숫자 7~15자리와 하이픈(-)으로 입력해 주세요.");
+        if("네이버 회원".equals(profile.name().trim()))
+            throw new IllegalArgumentException("실제 담당자명을 입력해 주세요.");
+        boolean incomplete=!user.hasCompleteProfile();
+        user.setName(profile.name().trim());user.setCompanyName(profile.companyName().trim());
+        user.setPhone(profile.phone().trim());users.saveAndFlush(user);
+        if(incomplete)privacy.record("USER",user.getId(),user.getEmail(),clientIpResolver.resolve(request),request.getHeader("User-Agent"));
+        return me(auth);
     }
     @PostMapping("/register") @Transactional
     public ResponseEntity<Map<String,String>> register(@Valid @RequestBody Registration r,HttpServletRequest request){
